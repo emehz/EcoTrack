@@ -1,0 +1,157 @@
+:root {
+  --bosque-800: #013d27;
+  --bosque-700: #025234;
+  --hoja-600: #4c9a0e;
+  --hoja-400: #7cc61a;
+  --hoja-200: #cfe8a3;
+  --rotulo: #ffc400;
+  --blanco: #ffffff;
+  --tinta: #0d2a1f;
+  --tinta-media: #475c52;
+  --tinta-suave: #5c7066;
+  --linea: #e2e8e2;
+  --linea-fuerte: #84918a;
+  --tenue: #f5f7f3;
+  --tinte: #eff5e1;
+  --exito-tinta: #025234;
+  --exito-fondo: #ddf0d0;
+  --aviso-tinta: #6f4800;
+  --aviso-fondo: #fff0b8;
+  --peligro: #b3261e;
+  --peligro-oscuro: #8f1e18;
+  --peligro-tinta: #9e1f18;
+  --peligro-fondo: #fbe6e3;
+  --info-tinta: #17507f;
+  --info-fondo: #e0ecf6;
+  --neutro-fondo: #ebefea;
+
+  --fuente: 'Barlow', system-ui, sans-serif;
+  --fuente-titulo: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+
+  --radio-s: 2px;
+  --radio-m: 3px;
+
+  --e-xs: 4px;
+  --e-s: 8px;
+  --e-m: 12px;
+  --e-l: 18px;
+  --e-xl: 32px;
+
+  --ease-salida: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-panel: cubic-bezier(0.32, 0.72, 0, 1);
+  --riel: 220px;
+
+  color: var(--tinta);
+  background: var(--blanco);
+  font-family: var(--fuente);
+  font-size: 15px;
+  line-height: 1.4;
+  font-variant-numeric: lining-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body,
+h1,
+h2,
+h3,
+p,
+dl,
+dd,
+ul {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: var(--bosque-700);
+  text-underline-offset: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--bosque-700);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--hoja-200);
+  color: var(--tinta);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--linea-fuerte) transparent;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.toast-descripcion {
+  color: var(--hoja-200) !important;
+}
+
+.skeleton {
+  display: block;
+  background: var(--neutro-fondo);
+  border-radius: var(--radio-m);
+  animation: pulso 1.4s ease-in-out infinite;
+}
+
+@keyframes pulso {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

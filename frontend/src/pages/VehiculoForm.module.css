@@ -1,0 +1,93 @@
+.resumen {
+  outline: none;
+}
+
+.cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 680px) 340px;
+  align-items: start;
+  gap: 40px;
+}
+
+.formulario {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px var(--e-l);
+}
+
+.acciones {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: var(--e-s);
+  margin-top: 6px;
+}
+
+.panel {
+  padding: var(--e-l);
+  background: var(--tinte);
+  border-radius: var(--radio-m);
+}
+
+.panelTitulo {
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.panelCifra {
+  font-family: var(--fuente-titulo);
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--bosque-700);
+  font-variant-numeric: tabular-nums;
+}
+
+.panelTexto {
+  font-size: 14px;
+  color: var(--tinta-media);
+}
+
+.panelDatos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-s);
+  margin-top: var(--e-m);
+}
+
+.panelDatos dt {
+  font-size: 13px;
+  color: var(--tinta-media);
+}
+
+.panelDatos dd {
+  font-weight: 600;
+}
+
+.panelNota {
+  margin-top: var(--e-m);
+  font-size: 13px;
+  color: var(--tinta-media);
+}
+
+.panelAccion {
+  margin-top: var(--e-m);
+}
+
+.panelAviso {
+  font-weight: 500;
+  color: var(--aviso-tinta);
+}
+
+@media (max-width: 1240px) {
+  .cuerpo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--e-l);
+  }
+}
+
+@media (max-width: 620px) {
+  .formulario {
+    grid-template-columns: 1fr;
+  }
+}
