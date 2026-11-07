@@ -1,3 +1,7 @@
 <Solution>
   <Project Path="EcoTrack.csproj" />
+  <Project Path="frontend/frontend.esproj">
+    <Build />
+    <Deploy />
+  </Project>
 </Solution>

@@ -1,0 +1,27 @@
+.cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 620px) 340px;
+  align-items: start;
+  gap: 40px;
+}
+
+.permisos {
+  padding: var(--e-l);
+  background: var(--tinte);
+  border-radius: var(--radio-m);
+  color: var(--tinta-media);
+}
+
+.titulo {
+  margin-bottom: var(--e-s);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--tinta);
+}
+
+@media (max-width: 1100px) {
+  .cuerpo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--e-l);
+  }
+}

@@ -1,23 +1,109 @@
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using EcoTrack.Common;
+using EcoTrack.Data;
+using EcoTrack.Models;
+using EcoTrack.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+
+DotNetEnv.Env.TraversePath().Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Falta ConnectionStrings__DefaultConnection");
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+var jwtOpciones = JwtOpciones.Desde(builder.Configuration);
+
+builder.Services.AddSingleton(jwtOpciones);
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString, npgsql =>
+    {
+        npgsql.MapEnum<RolUsuario>("rol_usuario_enum", AppDbContext.Esquema);
+        npgsql.MapEnum<TipoVehiculo>("tipo_vehiculo_enum", AppDbContext.Esquema);
+        npgsql.MapEnum<TipoCombustible>("tipo_combustible_enum", AppDbContext.Esquema);
+        npgsql.MapEnum<EstadoVehiculo>("estado_vehiculo_enum", AppDbContext.Esquema);
+        npgsql.MapEnum<EstadoViaje>("estado_viaje_enum", AppDbContext.Esquema);
+    }));
+
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<VehiculoService>();
+builder.Services.AddScoped<FactorEmisionService>();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower));
+    });
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var details = context.ModelState
+            .Where(entrada => entrada.Value is { Errors.Count: > 0 })
+            .Select(entrada => new ErrorDetalle(entrada.Key, "El valor enviado no es válido."))
+            .ToList();
+        return new BadRequestObjectResult(RespuestaError.Crear(
+            CodigosError.SolicitudInvalida, "La solicitud no es válida.", context.HttpContext, details));
+    });
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.MapInboundClaims = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtOpciones.Emisor,
+            ValidateAudience = true,
+            ValidAudience = jwtOpciones.Audiencia,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOpciones.Secreto)),
+            ClockSkew = TimeSpan.FromMinutes(1),
+            RoleClaimType = TokenService.ClaimRol,
+            NameClaimType = TokenService.ClaimSujeto,
+        };
+    });
+builder.Services.AddAuthorization();
+
+var origenes = (builder.Configuration["CORS_ORIGINS"] ?? "http://localhost:5173")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+builder.Services.AddCors(options =>
+    options.AddDefaultPolicy(policy => policy.WithOrigins(origenes).AllowAnyHeader().AllowAnyMethod()));
+
 builder.Services.AddOpenApi();
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<ManejadorErrores>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+});
+
+app.UseExceptionHandler();
+app.UseStatusCodePages(ManejadorErrores.EscribirEstadoAsync);
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
-
+app.UseCors();
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
