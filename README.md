@@ -123,3 +123,57 @@ DB_POOL_MAX=5
 Configuracion de AWS (Para el SDK de S3)
 AWS_REGION=us-east-2
 S3_BUCKET_NAME=ecotrack-reportes-s3
+
+4. BASE DE DATOS: EJECUCION DEL SCRIPT (LOCAL)
+
+La base de datos se crea con un unico script: ecotrack_unificado.sql (EcoTrack v6.6, PostgreSQL 14 o superior). El script crea el schema "ecotrack" con sus tablas, tipos, triggers y vista, carga datos de prueba y crea el rol ecotrack_app con permisos limitados.
+
+El script esta dividido en tres partes que se ejecutan en este orden dentro del mismo archivo:
+
+Parte 1: Esquema (tablas, indices, triggers, funciones y vista).
+Parte 2: Datos semilla (usuarios, choferes, factores de emision, vehiculos, viajes y cargas de combustible de prueba).
+Parte 3: Rol de aplicacion y permisos (ecotrack_app).
+
+IMPORTANTE: el script debe ejecutarse sobre una base de datos NUEVA y VACIA. No es repetible: si se ejecuta dos veces sobre la misma base, fallara porque los tipos y tablas ya existen.
+
+4.1 Requisitos
+
+- PostgreSQL 14 o superior instalado.
+- pgAdmin 4 o el cliente psql.
+- Un usuario con permisos para crear esquemas, extensiones y roles (por ejemplo, postgres).
+
+4.2 Ejecucion con pgAdmin 4
+
+1. Crear una base de datos nueva llamada ecotrack_db (clic derecho en Databases > Create > Database).
+2. Abrir Query Tool sobre ecotrack_db.
+3. Abrir el archivo ecotrack_unificado.sql y ejecutarlo completo (F5).
+
+4.3 Ejecucion con psql
+
+createdb -U postgres ecotrack_db
+psql -U postgres -d ecotrack_db -v ON_ERROR_STOP=1 -f ecotrack_unificado.sql
+
+La opcion -v ON_ERROR_STOP=1 detiene la ejecucion en el primer error.
+
+4.4 Verificacion
+
+Las tablas estan en el schema ecotrack, por lo que se consultan con ese prefijo:
+
+\dt ecotrack.*                                   (debe listar 14 tablas)
+SELECT count(*) FROM ecotrack.usuario;           (3)
+SELECT count(*) FROM ecotrack.factor_emision;    (18)
+SELECT count(*) FROM ecotrack.vehiculo;          (10)
+SELECT count(*) FROM ecotrack.viaje;             (10)
+
+4.5 Datos de prueba
+
+Los usuarios semilla (admin@ecotrack.sv, operador@ecotrack.sv y auditor@ecotrack.sv) usan una contrasena de prueba y existen solo para desarrollo. Deben eliminarse o cambiarse antes de usar datos reales.
+
+4.6 Reinicio de la base de datos (solo desarrollo)
+
+Para volver a empezar desde cero:
+
+DROP SCHEMA IF EXISTS ecotrack CASCADE;
+DROP ROLE IF EXISTS ecotrack_app;
+
+Luego se vuelve a ejecutar el script completo. Esto elimina todos los datos.
