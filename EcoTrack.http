@@ -1,6 +1,74 @@
-@EcoTrack_HostAddress = http://localhost:5070
+@host = http://localhost:5070/api/v1
+@token = pega_aqui_el_token_del_login
 
-GET {{EcoTrack_HostAddress}}/weatherforecast/
+GET {{host}}/health
 Accept: application/json
 
 ###
+
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "correo": "admin@ecotrack.sv",
+  "contrasena": "password123"
+}
+
+###
+
+GET {{host}}/auth/perfil
+Authorization: Bearer {{token}}
+
+###
+
+GET {{host}}/catalogos
+Authorization: Bearer {{token}}
+
+###
+
+GET {{host}}/factores/vigente?tipo_vehiculo=camion&tipo_combustible=diesel
+Authorization: Bearer {{token}}
+
+###
+
+POST {{host}}/vehiculos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "placa": "c 48213",
+  "tipo_vehiculo": "camion",
+  "tipo_combustible": "diesel"
+}
+
+###
+
+GET {{host}}/vehiculos?estado=todos&page=1&limit=20&sort=placa&order=asc
+Authorization: Bearer {{token}}
+
+###
+
+@id = pega_aqui_el_id_del_vehiculo
+
+GET {{host}}/vehiculos/{{id}}
+Authorization: Bearer {{token}}
+
+###
+
+PATCH {{host}}/vehiculos/{{id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "estado": "mantenimiento"
+}
+
+###
+
+PATCH {{host}}/vehiculos/{{id}}/estado
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "estado": "inactivo"
+}
