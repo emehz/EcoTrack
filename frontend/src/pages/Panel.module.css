@@ -1,0 +1,148 @@
+.principal {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 40px;
+}
+
+.titular {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--e-l);
+  margin-bottom: var(--e-s);
+}
+
+.cifra {
+  font-family: var(--fuente-titulo);
+  font-size: 92px;
+  font-weight: 800;
+  line-height: 0.9;
+  color: var(--bosque-700);
+  font-variant-numeric: tabular-nums;
+}
+
+.cifra small {
+  font-size: 34px;
+}
+
+.contexto {
+  font-weight: 600;
+}
+
+.detalle {
+  font-size: 13px;
+  color: var(--tinta-media);
+}
+
+.grafico {
+  margin: 0;
+}
+
+.lienzo {
+  height: 190px;
+}
+
+.desglose {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 40px;
+}
+
+.seccion {
+  margin-bottom: var(--e-s);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.barra {
+  display: grid;
+  grid-template-columns: 80px 1fr 84px;
+  align-items: center;
+  gap: var(--e-s);
+  padding: 4px 0;
+}
+
+.pista span {
+  display: block;
+  height: 18px;
+  background: var(--bosque-700);
+  border-radius: 0 4px 4px 0;
+}
+
+.valor {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.tituloTabla {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.envoltura {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla thead th {
+  padding: 6px 8px;
+  border-bottom: 2px solid var(--tinta);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--tinta-media);
+  white-space: nowrap;
+}
+
+.tabla tbody th,
+.tabla td {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--linea);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tabla tbody th {
+  font-weight: 700;
+}
+
+.tabla .derecha {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tenue {
+  color: var(--tinta-media);
+}
+
+.distancia {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-s);
+}
+
+@media (max-width: 1100px) {
+  .principal {
+    grid-template-columns: 1fr;
+    gap: var(--e-l);
+  }
+}
+
+@media (max-width: 760px) {
+  .desglose {
+    grid-template-columns: 1fr;
+    gap: var(--e-l);
+  }
+
+  .cifra {
+    font-size: 72px;
+  }
+}

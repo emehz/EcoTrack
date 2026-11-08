@@ -1,0 +1,106 @@
+.cargando {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-l);
+}
+
+.cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  align-items: start;
+  gap: 40px;
+}
+
+.columna {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+
+.seccion {
+  padding-bottom: var(--e-s);
+  border-bottom: 2px solid var(--tinta);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.ficha {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 40px;
+}
+
+.dato {
+  padding: 11px 0;
+  border-bottom: 1px solid var(--linea);
+}
+
+.dato dt {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tinta-media);
+}
+
+.dato dd {
+  margin-top: 2px;
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.dato .notaDato {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tinta-suave);
+}
+
+.factor {
+  padding: var(--e-l);
+  background: var(--tinte);
+  border-radius: var(--radio-m);
+}
+
+.tituloPanel {
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.cifra {
+  font-family: var(--fuente-titulo);
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--bosque-700);
+  font-variant-numeric: tabular-nums;
+}
+
+.nota {
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--tinta-media);
+}
+
+.formula {
+  margin-top: var(--e-m);
+  padding-top: var(--e-s);
+  border-top: 1px solid var(--tinta);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1000px) {
+  .cuerpo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--e-l);
+  }
+}
+
+@media (max-width: 620px) {
+  .ficha {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

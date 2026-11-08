@@ -1,0 +1,211 @@
+.pestanas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  border-bottom: 1px solid var(--linea);
+}
+
+.pestana {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  min-height: 36px;
+  padding: 0 2px;
+  margin-bottom: -1px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tinta-media);
+}
+
+.pestanaActiva {
+  border-bottom-color: var(--bosque-700);
+  color: var(--bosque-700);
+}
+
+.conteo {
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--tinta-suave);
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-s);
+}
+
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 260px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--linea-fuerte);
+  border-radius: var(--radio-m);
+  color: var(--tinta-media);
+}
+
+.buscador:focus-within {
+  outline: 2px solid var(--bosque-700);
+  outline-offset: -1px;
+  border-color: var(--bosque-700);
+}
+
+.buscador input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--tinta);
+}
+
+.buscador input::placeholder {
+  color: var(--tinta-suave);
+}
+
+.envoltura {
+  position: relative;
+  overflow-x: auto;
+}
+
+.envoltura[aria-busy='true'] {
+  opacity: 0.7;
+  transition: opacity 150ms var(--ease-salida) 120ms;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla thead th {
+  padding: 6px 8px;
+  border-bottom: 2px solid var(--tinta);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--tinta-media);
+  white-space: nowrap;
+}
+
+.tabla tbody th,
+.tabla td {
+  padding: 8px;
+  border-bottom: 1px solid var(--linea);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tabla tbody th {
+  font-weight: 700;
+}
+
+.tabla tbody tr {
+  background: var(--blanco);
+}
+
+.tabla .celdaAcciones {
+  position: sticky;
+  right: 0;
+  background: var(--blanco);
+}
+
+.tabla tbody .celdaAcciones {
+  background: inherit;
+}
+
+@media (hover: hover) {
+  .tabla tbody tr:hover {
+    background: var(--tenue);
+  }
+
+  .pestana:not(.pestanaActiva):hover {
+    color: var(--tinta);
+    border-bottom-color: var(--linea-fuerte);
+  }
+
+  .ordenar:hover {
+    color: var(--tinta);
+  }
+}
+
+.tabla tbody tr.resaltada {
+  background: var(--tinte);
+}
+
+.tabla .derecha {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tenue {
+  color: var(--tinta-media);
+}
+
+.ordenar {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+}
+
+.flechaOculta {
+  opacity: 0;
+}
+
+.ordenar:hover .flechaOculta,
+.ordenar:focus-visible .flechaOculta {
+  opacity: 0.5;
+}
+
+.acciones {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.acciones a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  text-decoration: none;
+}
+
+.acciones a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 1000px) {
+  .tabla .celdaAcciones {
+    box-shadow: -1px 0 0 var(--linea);
+  }
+}
+
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-m);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--tinta-media);
+}
+
+.paginas {
+  display: inline-flex;
+  gap: 14px;
+}
