@@ -13,6 +13,10 @@ public partial class AppDbContext(DbContextOptions<AppDbContext> options) : DbCo
     public DbSet<Vehiculo> Vehiculos => Set<Vehiculo>();
     public DbSet<Viaje> Viajes => Set<Viaje>();
     public DbSet<CargaCombustible> CargasCombustible => Set<CargaCombustible>();
+    public DbSet<ReporteViaje> ReportesViaje => Set<ReporteViaje>();
+    public DbSet<ReporteVersion> ReporteVersiones => Set<ReporteVersion>();
+    public DbSet<HuellaReporte> HuellasReporte => Set<HuellaReporte>();
+    public DbSet<HuellaReporteDetalle> HuellasReporteDetalle => Set<HuellaReporteDetalle>();
 
     public async Task GuardarComoAsync(Guid usuarioId, CancellationToken cancelacion)
     {
@@ -65,6 +69,36 @@ public partial class AppDbContext(DbContextOptions<AppDbContext> options) : DbCo
             entidad.ToTable("carga_combustible");
             entidad.HasKey(c => c.CargaCombustibleId);
             entidad.HasOne(c => c.Vehiculo).WithMany().HasForeignKey(c => c.VehiculoId);
+        });
+
+        modelBuilder.Entity<ReporteViaje>(entidad =>
+        {
+            entidad.ToTable("reporte_viaje");
+            entidad.HasKey(r => r.ReporteViajeId);
+            entidad.Property(r => r.Filtros).HasColumnType("jsonb");
+            entidad.HasOne(r => r.GeneradoPor).WithMany().HasForeignKey(r => r.GeneradoPorUsuarioId);
+            entidad.HasMany(r => r.Versiones).WithOne(v => v.Reporte).HasForeignKey(v => v.ReporteViajeId);
+        });
+
+        modelBuilder.Entity<ReporteVersion>(entidad =>
+        {
+            entidad.ToTable("reporte_version");
+            entidad.HasKey(v => v.ReporteVersionId);
+            entidad.HasOne(v => v.Huella).WithOne().HasForeignKey<HuellaReporte>(h => h.ReporteVersionId);
+        });
+
+        modelBuilder.Entity<HuellaReporte>(entidad =>
+        {
+            entidad.ToTable("huella_reporte");
+            entidad.HasKey(h => h.HuellaReporteId);
+            entidad.HasMany(h => h.Detalle).WithOne().HasForeignKey(d => d.HuellaReporteId);
+        });
+
+        modelBuilder.Entity<HuellaReporteDetalle>(entidad =>
+        {
+            entidad.ToTable("huella_reporte_detalle");
+            entidad.HasKey(d => d.HuellaReporteDetalleId);
+            entidad.Property(d => d.HuellaReporteDetalleId).UseIdentityAlwaysColumn();
         });
 
         foreach (var tipo in modelBuilder.Model.GetEntityTypes())

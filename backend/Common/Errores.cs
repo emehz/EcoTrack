@@ -91,7 +91,14 @@ public sealed partial class ManejadorErrores(ILogger<ManejadorErrores> logger, I
             return (api.Estado, RespuestaError.Crear(api.Codigo, api.Message, contexto, api.Detalles));
         }
 
-        if (error is DbUpdateException { InnerException: PostgresException postgres })
+        var postgres = error switch
+        {
+            DbUpdateException { InnerException: PostgresException interna } => interna,
+            PostgresException directa => directa,
+            _ => null,
+        };
+
+        if (postgres is not null)
         {
             var traducido = TraducirPostgres(postgres, contexto);
             if (traducido is not null)
@@ -107,6 +114,9 @@ public sealed partial class ManejadorErrores(ILogger<ManejadorErrores> logger, I
     private static (int Estado, RespuestaError Respuesta)? TraducirPostgres(PostgresException error, HttpContext contexto) =>
         error.ConstraintName switch
         {
+            null when error.SqlState is PostgresErrorCodes.CheckViolation or PostgresErrorCodes.RestrictViolation
+                or PostgresErrorCodes.IntegrityConstraintViolation => (StatusCodes.Status422UnprocessableEntity,
+                RespuestaError.Crear(CodigosError.Validacion, error.MessageText, contexto)),
             "ux_vehiculo_placa_upper" => (StatusCodes.Status409Conflict, RespuestaError.Crear(
                 CodigosError.Conflicto, "Ya existe un vehículo con esa placa.", contexto,
                 [new ErrorDetalle("placa", "Ya existe un vehículo con esta placa.")])),
