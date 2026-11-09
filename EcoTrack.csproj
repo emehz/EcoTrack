@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <DefaultItemExcludes>$(DefaultItemExcludes);frontend/**;backend/Postman/**;backend/Database/**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);frontend/**;backend/Postman/**;backend/Database/**;bucket-local/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
