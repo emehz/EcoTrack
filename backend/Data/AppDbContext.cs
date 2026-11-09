@@ -18,6 +18,9 @@ public partial class AppDbContext(DbContextOptions<AppDbContext> options) : DbCo
     public DbSet<HuellaReporte> HuellasReporte => Set<HuellaReporte>();
     public DbSet<HuellaReporteDetalle> HuellasReporteDetalle => Set<HuellaReporteDetalle>();
 
+    public DbSet<AuditoriaReporte> AuditoriasReporte => Set<AuditoriaReporte>();
+    public DbSet<HallazgoAuditoria> HallazgosAuditoria => Set<HallazgoAuditoria>();
+
     public async Task GuardarComoAsync(Guid usuarioId, CancellationToken cancelacion)
     {
         await using var transaccion = await Database.BeginTransactionAsync(cancelacion);
@@ -99,6 +102,25 @@ public partial class AppDbContext(DbContextOptions<AppDbContext> options) : DbCo
             entidad.ToTable("huella_reporte_detalle");
             entidad.HasKey(d => d.HuellaReporteDetalleId);
             entidad.Property(d => d.HuellaReporteDetalleId).UseIdentityAlwaysColumn();
+        });
+
+        modelBuilder.Entity<AuditoriaReporte>(entidad =>
+        {
+            entidad.ToTable("auditoria_reporte");
+            entidad.HasKey(a => a.AuditoriaReporteId);
+            entidad.HasOne(a => a.Reporte).WithMany().HasForeignKey(a => a.ReporteViajeId);
+            entidad.HasOne(a => a.VersionAuditada).WithMany().HasForeignKey(a => a.VersionAuditadaId);
+            entidad.HasOne(a => a.VersionFinal).WithMany().HasForeignKey(a => a.VersionFinalId);
+            entidad.HasOne(a => a.Auditor).WithMany().HasForeignKey(a => a.AuditorUsuarioId);
+            entidad.HasMany(a => a.Hallazgos).WithOne().HasForeignKey(h => h.AuditoriaReporteId);
+        });
+
+        modelBuilder.Entity<HallazgoAuditoria>(entidad =>
+        {
+            entidad.ToTable("hallazgo_auditoria");
+            entidad.HasKey(h => h.HallazgoAuditoriaId);
+            entidad.HasOne(h => h.ResueltoPor).WithMany().HasForeignKey(h => h.ResueltoPorUsuarioId);
+            entidad.HasOne(h => h.DetectadoPor).WithMany().HasForeignKey(h => h.DetectadoPorUsuarioId);
         });
 
         foreach (var tipo in modelBuilder.Model.GetEntityTypes())
