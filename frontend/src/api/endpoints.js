@@ -39,3 +39,17 @@ export const reprocesarVersion = (id, version) =>
   request(`/reportes/${id}/versiones/${version}/reprocesar`, { method: 'POST' });
 
 export const descargarCsvReporte = (id, version, nombre) => download(`/reportes/${id}/versiones/${version}/csv`, nombre);
+
+export const getAuditorias = (params, signal) => request('/auditorias', { params, signal });
+
+export const getAuditoria = (id, signal) => request(`/auditorias/${id}`, { signal });
+
+export const iniciarAuditoria = (reporteId, body) =>
+  request(`/reportes/${reporteId}/auditorias`, { method: 'POST', body });
+
+export const registrarHallazgo = (id, body) => request(`/auditorias/${id}/hallazgos`, { method: 'POST', body });
+
+export const cambiarEstadoHallazgo = (id, hallazgoId, body) =>
+  request(`/auditorias/${id}/hallazgos/${hallazgoId}`, { method: 'PATCH', body });
+
+export const cerrarAuditoria = (id, body) => request(`/auditorias/${id}/cerrar`, { method: 'POST', body });
