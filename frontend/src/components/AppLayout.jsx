@@ -39,7 +39,7 @@ const SECCIONES = [
     titulo: 'Reportes',
     items: [
       { texto: 'Reportes', to: '/reportes', icono: FileText },
-      { texto: 'Auditorías', icono: ShieldCheck },
+      { texto: 'Auditorías', to: '/auditorias', icono: ShieldCheck, roles: ['admin', 'auditor'] },
     ],
   },
   {

@@ -15,6 +15,8 @@ const Perfil = lazy(() => import('./pages/Perfil'));
 const Reportes = lazy(() => import('./pages/Reportes'));
 const ReporteNuevo = lazy(() => import('./pages/ReporteNuevo'));
 const ReporteDetalle = lazy(() => import('./pages/ReporteDetalle'));
+const Auditorias = lazy(() => import('./pages/Auditorias'));
+const AuditoriaDetalle = lazy(() => import('./pages/AuditoriaDetalle'));
 
 function RequireAuth() {
   const { usuario, cargando } = useAuth();
@@ -73,6 +75,10 @@ export default function App() {
                 <Route path="reportes/nuevo" element={<ReporteNuevo />} />
               </Route>
               <Route path="reportes/:id" element={<ReporteDetalle />} />
+              <Route element={<RequireRoles roles={['admin', 'auditor']} />}>
+                <Route path="auditorias" element={<Auditorias />} />
+                <Route path="auditorias/:id" element={<AuditoriaDetalle />} />
+              </Route>
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
