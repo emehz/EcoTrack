@@ -6,6 +6,7 @@ using EcoTrack.Common;
 using EcoTrack.Data;
 using EcoTrack.Models;
 using EcoTrack.Services;
+using EcoTrack.Services.Almacenamiento;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
@@ -36,6 +37,10 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<VehiculoService>();
 builder.Services.AddScoped<FactorEmisionService>();
+
+var rutaAlmacenamiento = Path.Combine(
+    builder.Environment.ContentRootPath, builder.Configuration["ALMACENAMIENTO_LOCAL_RUTA"] ?? "bucket-local");
+builder.Services.AddSingleton<IAlmacenamientoArchivos>(new AlmacenamientoLocal(rutaAlmacenamiento));
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
