@@ -117,6 +117,8 @@ public sealed partial class ManejadorErrores(ILogger<ManejadorErrores> logger, I
             null when error.SqlState is PostgresErrorCodes.CheckViolation or PostgresErrorCodes.RestrictViolation
                 or PostgresErrorCodes.IntegrityConstraintViolation => (StatusCodes.Status422UnprocessableEntity,
                 RespuestaError.Crear(CodigosError.Validacion, error.MessageText, contexto)),
+            "ux_auditoria_reporte_abierta" => (StatusCodes.Status409Conflict, RespuestaError.Crear(
+                CodigosError.Conflicto, "Ya hay una auditoría abierta para este reporte.", contexto)),
             "ux_vehiculo_placa_upper" => (StatusCodes.Status409Conflict, RespuestaError.Crear(
                 CodigosError.Conflicto, "Ya existe un vehículo con esa placa.", contexto,
                 [new ErrorDetalle("placa", "Ya existe un vehículo con esta placa.")])),

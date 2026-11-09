@@ -59,5 +59,6 @@ public static class Nombres
     public const string RolAdmin = "admin";
     public const string RolOperador = "operador";
 
+    public const string RolAuditor = "auditor";
     public static string DeRol(RolUsuario rol) => rol.ToString().ToLowerInvariant();
 }

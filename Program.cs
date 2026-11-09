@@ -7,6 +7,7 @@ using EcoTrack.Data;
 using EcoTrack.Models;
 using EcoTrack.Services;
 using EcoTrack.Services.Almacenamiento;
+using EcoTrack.Services.Auditorias;
 using EcoTrack.Services.Reportes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -36,6 +37,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         npgsql.MapEnum<OrigenVersion>("origen_version_enum", AppDbContext.Esquema);
         npgsql.MapEnum<EstadoCalculo>("estado_carga_enum", AppDbContext.Esquema);
         npgsql.MapEnum<EstadoDetalleHuella>("estado_detalle_huella_enum", AppDbContext.Esquema);
+        npgsql.MapEnum<EstadoAuditoria>("estado_auditoria_reporte_enum", AppDbContext.Esquema);
+        npgsql.MapEnum<ResultadoAuditoria>("resultado_auditoria_enum", AppDbContext.Esquema);
+        npgsql.MapEnum<SeveridadHallazgo>("severidad_hallazgo_enum", AppDbContext.Esquema);
+        npgsql.MapEnum<EstadoHallazgo>("estado_hallazgo_enum", AppDbContext.Esquema);
+        npgsql.MapEnum<OrigenHallazgo>("origen_hallazgo_enum", AppDbContext.Esquema);
     }));
 
 builder.Services.AddScoped<AuthService>();
@@ -51,6 +57,9 @@ builder.Services.AddSingleton<SenalCalculoHuella>();
 builder.Services.AddScoped<ReporteService>();
 builder.Services.AddScoped<CalculadorHuella>();
 builder.Services.AddHostedService<ProcesadorHuella>();
+builder.Services.AddSingleton(ParametrosAuditoria.Desde(builder.Configuration));
+builder.Services.AddScoped<ControlesAuditoria>();
+builder.Services.AddScoped<AuditoriaReporteService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
