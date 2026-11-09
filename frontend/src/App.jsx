@@ -12,6 +12,9 @@ const Vehiculos = lazy(() => import('./pages/Vehiculos'));
 const VehiculoForm = lazy(() => import('./pages/VehiculoForm'));
 const VehiculoDetalle = lazy(() => import('./pages/VehiculoDetalle'));
 const Perfil = lazy(() => import('./pages/Perfil'));
+const Reportes = lazy(() => import('./pages/Reportes'));
+const ReporteNuevo = lazy(() => import('./pages/ReporteNuevo'));
+const ReporteDetalle = lazy(() => import('./pages/ReporteDetalle'));
 
 function RequireAuth() {
   const { usuario, cargando } = useAuth();
@@ -27,6 +30,16 @@ function RequireWrite() {
   return (
     <EmptyState titulo="No tienes permiso para esta acción" accion={<Button to="/vehiculos" variant="secundario">Volver a vehículos</Button>}>
       Tu rol permite consultar vehículos. Los registra y modifica un administrador.
+    </EmptyState>
+  );
+}
+
+function RequireRoles({ roles }) {
+  const { usuario } = useAuth();
+  if (roles.includes(usuario?.rol)) return <Outlet />;
+  return (
+    <EmptyState titulo="No tienes permiso para esta sección" accion={<Button to="/" variant="secundario">Volver al panel</Button>}>
+      Tu rol no tiene acceso a esta pantalla.
     </EmptyState>
   );
 }
@@ -55,6 +68,11 @@ export default function App() {
               </Route>
               <Route path="vehiculos/:id" element={<VehiculoDetalle />} />
               <Route path="perfil" element={<Perfil />} />
+              <Route path="reportes" element={<Reportes />} />
+              <Route element={<RequireRoles roles={['admin', 'operador']} />}>
+                <Route path="reportes/nuevo" element={<ReporteNuevo />} />
+              </Route>
+              <Route path="reportes/:id" element={<ReporteDetalle />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

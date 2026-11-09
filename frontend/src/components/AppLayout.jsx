@@ -38,7 +38,7 @@ const SECCIONES = [
   {
     titulo: 'Reportes',
     items: [
-      { texto: 'Reportes', icono: FileText },
+      { texto: 'Reportes', to: '/reportes', icono: FileText },
       { texto: 'Auditorías', icono: ShieldCheck },
     ],
   },
