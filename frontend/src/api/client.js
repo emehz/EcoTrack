@@ -69,3 +69,36 @@ export async function request(path, { method = 'GET', body, signal, params } = {
     payload?.error ?? { code: 'ERROR', message: 'Ocurrió un error. Inténtalo de nuevo.' },
   );
 }
+
+export async function download(path, nombre) {
+  const session = readSession();
+  let response;
+  try {
+    response = await fetch(API_BASE_URL + path, {
+      headers: session ? { Authorization: `Bearer ${session.token}` } : {},
+    });
+  } catch {
+    throw new ApiError(0, {
+      code: 'SIN_CONEXION',
+      message: 'No pudimos conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.',
+    });
+  }
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    if (response.status === 401 && session) {
+      clearSession();
+      onSessionExpired();
+    }
+    throw new ApiError(response.status, payload?.error ?? { code: 'ERROR', message: 'No se pudo descargar el archivo.' });
+  }
+
+  const url = URL.createObjectURL(await response.blob());
+  const enlace = document.createElement('a');
+  enlace.href = url;
+  enlace.download = nombre;
+  document.body.append(enlace);
+  enlace.click();
+  enlace.remove();
+  URL.revokeObjectURL(url);
+}

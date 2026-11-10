@@ -1,0 +1,14 @@
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-m);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--tinta-media);
+}
+
+.paginas {
+  display: inline-flex;
+  gap: 14px;
+}

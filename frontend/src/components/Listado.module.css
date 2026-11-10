@@ -1,0 +1,122 @@
+.pestanas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  border-bottom: 1px solid var(--linea);
+}
+
+.pestana {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  min-height: 36px;
+  padding: 0 2px;
+  margin-bottom: -1px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tinta-media);
+}
+
+.pestanaActiva {
+  border-bottom-color: var(--bosque-700);
+  color: var(--bosque-700);
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--e-s);
+}
+
+.envoltura {
+  position: relative;
+  overflow-x: auto;
+}
+
+.envoltura[aria-busy='true'] {
+  opacity: 0.7;
+  transition: opacity 150ms var(--ease-salida) 120ms;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla thead th {
+  padding: 6px 8px;
+  border-bottom: 2px solid var(--tinta);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--tinta-media);
+  white-space: nowrap;
+}
+
+.tabla tbody th,
+.tabla td {
+  padding: 8px;
+  border-bottom: 1px solid var(--linea);
+  text-align: left;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.tabla tbody th {
+  font-weight: 700;
+}
+
+.tabla tbody tr {
+  background: var(--blanco);
+}
+
+.tabla .derecha {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabla .ajustar {
+  min-width: 220px;
+  white-space: normal;
+}
+
+.tenue {
+  color: var(--tinta-media);
+}
+
+.mono {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 13px;
+}
+
+.acciones {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.acciones a {
+  text-decoration: none;
+}
+
+.acciones a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .tabla tbody tr:hover {
+    background: var(--tenue);
+  }
+
+  .pestana:not(.pestanaActiva):hover {
+    color: var(--tinta);
+    border-bottom-color: var(--linea-fuerte);
+  }
+}

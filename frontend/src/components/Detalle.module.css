@@ -1,0 +1,114 @@
+.cargando {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-l);
+}
+
+.cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-items: start;
+  gap: 40px;
+}
+
+.columna {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+
+.seccion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--e-s);
+  padding-bottom: var(--e-s);
+  margin-bottom: var(--e-s);
+  border-bottom: 2px solid var(--tinta);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-s);
+  padding: var(--e-l);
+  background: var(--tinte);
+  border-radius: var(--radio-m);
+}
+
+.tituloPanel {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.cifras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+}
+
+.cifra {
+  font-family: var(--fuente-titulo);
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--bosque-700);
+  font-variant-numeric: tabular-nums;
+}
+
+.nota {
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--tinta-media);
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+}
+
+.lista > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--e-m);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--linea);
+  font-size: 14px;
+}
+
+.lista dt {
+  flex: none;
+  color: var(--tinta-media);
+}
+
+.lista dd {
+  min-width: 0;
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.texto {
+  font-size: 14px;
+  white-space: pre-line;
+}
+
+.secundario {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tinta-suave);
+  white-space: normal;
+}
+
+@media (max-width: 1000px) {
+  .cuerpo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--e-l);
+  }
+}

@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# Carpeta local que simula el bucket de S3
+bucket-local/
+
 # User-specific files
 *.rsuser
 *.suo
