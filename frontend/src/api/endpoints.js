@@ -53,3 +53,13 @@ export const cambiarEstadoHallazgo = (id, hallazgoId, body) =>
   request(`/auditorias/${id}/hallazgos/${hallazgoId}`, { method: 'PATCH', body });
 
 export const cerrarAuditoria = (id, body) => request(`/auditorias/${id}/cerrar`, { method: 'POST', body });
+
+export const getChoferes = (params, signal) => request('/choferes', { params, signal });
+
+export const getChofer = (id, signal) => request(`/choferes/${id}`, { signal });
+
+export const createChofer = (body) => request('/choferes', { method: 'POST', body });
+
+export const updateChofer = (id, body) => request(`/choferes/${id}`, { method: 'PATCH', body });
+
+export const cambiarEstadoChofer = (id, estado) => request(`/choferes/${id}/estado`, { method: 'PATCH', body: { estado } });
