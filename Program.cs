@@ -46,6 +46,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }));
 
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<IntentosLogin>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<VehiculoService>();
 builder.Services.AddScoped<FactorEmisionService>();
