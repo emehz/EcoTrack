@@ -11,6 +11,7 @@ public partial class AppDbContext(DbContextOptions<AppDbContext> options) : DbCo
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<FactorEmision> FactoresEmision => Set<FactorEmision>();
     public DbSet<Vehiculo> Vehiculos => Set<Vehiculo>();
+    public DbSet<Chofer> Choferes => Set<Chofer>();
     public DbSet<Viaje> Viajes => Set<Viaje>();
     public DbSet<CargaCombustible> CargasCombustible => Set<CargaCombustible>();
     public DbSet<ReporteViaje> ReportesViaje => Set<ReporteViaje>();
@@ -58,6 +59,12 @@ public partial class AppDbContext(DbContextOptions<AppDbContext> options) : DbCo
             entidad.Property(v => v.VehiculoId).HasDefaultValueSql("gen_random_uuid()");
             entidad.Property(v => v.CreadoEn).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
             entidad.Property(v => v.ActualizadoEn).HasDefaultValueSql("now()").ValueGeneratedOnAddOrUpdate();
+        });
+
+        modelBuilder.Entity<Chofer>(entidad =>
+        {
+            entidad.ToTable("chofer");
+            entidad.HasKey(c => c.ChoferId);
         });
 
         modelBuilder.Entity<Viaje>(entidad =>
