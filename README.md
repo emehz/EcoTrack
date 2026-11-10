@@ -34,7 +34,7 @@ Ubicacion: Subred Publica en us-east-2a.
 
 Rol IAM Adjunto: ecotrack-ec2-s3-role (Permite a la instancia interactuar con S3 sin credenciales estaticas).
 
-Software Instalado: Node.js, npm, Nginx (como proxy inverso).
+Software a instalar: runtime de ASP.NET Core (.NET 10) para la API y Nginx como proxy inverso. El frontend se publica como archivos estaticos generados con npm run build.
 
 2.3 Base de Datos (Amazon RDS)
 
@@ -102,27 +102,16 @@ Limite de instancias: Solo se permite una instancia EC2 y una instancia RDS acti
 
 CONFIGURACION DE VARIABLES DE ENTORNO
 
-La aplicacion utiliza la libreria dotenv para leer las credenciales. El archivo .env real nunca se sube al repositorio (esta incluido en .gitignore).
+La API (.NET) lee su configuracion con la libreria DotNetEnv desde un archivo .env en la raiz del proyecto. El archivo .env real nunca se sube al repositorio (esta incluido en .gitignore).
 
-Para configurar un entorno, se debe crear un archivo .env basado en el archivo .env.example provisto en la raiz del proyecto, con la siguiente estructura:
+Para configurar un entorno se copia .env.example como .env y se completan sus valores:
 
-Configuracion del Servidor Backend
-PORT=3000
-NODE_ENV=production
-
-Configuracion de Amazon RDS (PostgreSQL)
-DB_HOST=ecotrack-db.xxxxxxxxxxxx.us-east-2.rds.amazonaws.com
-DB_PORT=5432
-DB_NAME=ecotrack_db
-DB_USER=ecotrack_app
-DB_PASSWORD=********
-DB_SSL=true
-DB_SSL_CA=/opt/ecotrack/certs/global-bundle.pem
-DB_POOL_MAX=5
-
-Configuracion de AWS (Para el SDK de S3)
-AWS_REGION=us-east-2
-S3_BUCKET_NAME=ecotrack-reportes-s3
+ASPNETCORE_ENVIRONMENT: Development en local y Production en la EC2.
+ConnectionStrings\_\_DefaultConnection: cadena de conexion a PostgreSQL con el usuario ecotrack_app. En AWS apunta al endpoint de RDS y agrega SSL Mode=Require.
+CORS_ORIGINS: direccion del frontend que puede llamar a la API.
+JWT_SECRET, JWT_ISSUER y JWT_AUDIENCE: firma de los tokens de sesion. JWT_SECRET debe tener al menos 32 caracteres.
+ALMACENAMIENTO_LOCAL_RUTA: carpeta que simula el bucket de S3, con reportes/ y resultados/.
+AUDITORIA_TOLERANCIA_CO2_KG y AUDITORIA_UMBRAL_DISTANCIA_KM: parametros opcionales de la auditoria de reportes.
 
 4. BASE DE DATOS: EJECUCION DEL SCRIPT (LOCAL)
 
@@ -142,7 +131,7 @@ IMPORTANTE: el script debe ejecutarse sobre una base de datos NUEVA y VACIA. No 
 - pgAdmin 4 o el cliente psql.
 - Un usuario con permisos para crear esquemas, extensiones y roles (por ejemplo, postgres).
 
-4.2 Ejecucion con pgAdmin 4
+  4.2 Ejecucion con pgAdmin 4
 
 1. Crear una base de datos nueva llamada ecotrack_db (clic derecho en Databases > Create > Database).
 2. Abrir Query Tool sobre ecotrack_db.
@@ -159,11 +148,11 @@ La opcion -v ON_ERROR_STOP=1 detiene la ejecucion en el primer error.
 
 Las tablas estan en el schema ecotrack, por lo que se consultan con ese prefijo:
 
-\dt ecotrack.*                                   (debe listar 14 tablas)
-SELECT count(*) FROM ecotrack.usuario;           (3)
-SELECT count(*) FROM ecotrack.factor_emision;    (18)
-SELECT count(*) FROM ecotrack.vehiculo;          (10)
-SELECT count(*) FROM ecotrack.viaje;             (10)
+\dt ecotrack._ (debe listar 14 tablas)
+SELECT count(_) FROM ecotrack.usuario; (3)
+SELECT count(_) FROM ecotrack.factor_emision; (18)
+SELECT count(_) FROM ecotrack.vehiculo; (10)
+SELECT count(\*) FROM ecotrack.viaje; (10)
 
 4.5 Datos de prueba
 
