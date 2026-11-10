@@ -12,6 +12,9 @@ const Vehiculos = lazy(() => import('./pages/Vehiculos'));
 const VehiculoForm = lazy(() => import('./pages/VehiculoForm'));
 const VehiculoDetalle = lazy(() => import('./pages/VehiculoDetalle'));
 const Perfil = lazy(() => import('./pages/Perfil'));
+const Choferes = lazy(() => import('./pages/Choferes'));
+const ChoferForm = lazy(() => import('./pages/ChoferForm'));
+const ChoferDetalle = lazy(() => import('./pages/ChoferDetalle'));
 const Reportes = lazy(() => import('./pages/Reportes'));
 const ReporteNuevo = lazy(() => import('./pages/ReporteNuevo'));
 const ReporteDetalle = lazy(() => import('./pages/ReporteDetalle'));
@@ -70,6 +73,12 @@ export default function App() {
               </Route>
               <Route path="vehiculos/:id" element={<VehiculoDetalle />} />
               <Route path="perfil" element={<Perfil />} />
+              <Route path="choferes" element={<Choferes />} />
+              <Route element={<RequireRoles roles={['admin']} />}>
+                <Route path="choferes/nuevo" element={<ChoferForm />} />
+                <Route path="choferes/:id/editar" element={<ChoferForm />} />
+              </Route>
+              <Route path="choferes/:id" element={<ChoferDetalle />} />
               <Route path="reportes" element={<Reportes />} />
               <Route element={<RequireRoles roles={['admin', 'operador']} />}>
                 <Route path="reportes/nuevo" element={<ReporteNuevo />} />

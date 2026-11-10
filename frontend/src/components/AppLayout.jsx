@@ -26,7 +26,7 @@ const SECCIONES = [
       { texto: 'Vehículos', to: '/vehiculos', icono: Truck },
       { texto: 'Viajes', icono: Route },
       { texto: 'Combustible', icono: Fuel },
-      { texto: 'Choferes', icono: IdCard },
+      { texto: 'Choferes', to: '/choferes', icono: IdCard },
     ],
   },
   {
