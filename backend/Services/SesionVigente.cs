@@ -19,15 +19,23 @@ public sealed class SesionVigente(IMemoryCache cache)
             return false;
         }
 
-        var estado = await cache.GetOrCreateAsync(Clave(usuarioId), async entrada =>
+        EstadoCuenta? estado;
+        try
         {
-            entrada.AbsoluteExpirationRelativeToNow = Duracion;
-            var usuario = await db.Usuarios.AsNoTracking()
-                .Where(u => u.UsuarioId == usuarioId)
-                .Select(u => new { u.Activo, u.Rol, u.HashContrasena })
-                .FirstOrDefaultAsync(cancelacion);
-            return usuario is null ? null : new EstadoCuenta(usuario.Activo, usuario.Rol, TokenService.Sello(usuario.HashContrasena));
-        });
+            estado = await cache.GetOrCreateAsync(Clave(usuarioId), async entrada =>
+            {
+                entrada.AbsoluteExpirationRelativeToNow = Duracion;
+                var usuario = await db.Usuarios.AsNoTracking()
+                    .Where(u => u.UsuarioId == usuarioId)
+                    .Select(u => new { u.Activo, u.Rol, u.HashContrasena })
+                    .FirstOrDefaultAsync(cancelacion);
+                return usuario is null ? null : new EstadoCuenta(usuario.Activo, usuario.Rol, TokenService.Sello(usuario.HashContrasena));
+            });
+        }
+        catch (Exception) when (cancelacion.IsCancellationRequested)
+        {
+            return false;
+        }
 
         return estado is { Activo: true }
             && Nombres.DeRol(estado.Rol) == principal.FindFirstValue(TokenService.ClaimRol)
