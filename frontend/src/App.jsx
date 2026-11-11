@@ -25,6 +25,9 @@ const Choferes = lazy(() => import("./pages/Choferes"));
 const ChoferForm = lazy(() => import("./pages/ChoferForm"));
 const ChoferDetalle = lazy(() => import("./pages/ChoferDetalle"));
 const Factores = lazy(() => import("./pages/Factores"));
+const Viajes = lazy(() => import("./pages/Viajes"));
+const ViajeForm = lazy(() => import("./pages/ViajeForm"));
+const ViajeDetalle = lazy(() => import("./pages/ViajeDetalle"));
 const Reportes = lazy(() => import("./pages/Reportes"));
 const ReporteNuevo = lazy(() => import("./pages/ReporteNuevo"));
 const ReporteDetalle = lazy(() => import("./pages/ReporteDetalle"));
@@ -120,6 +123,12 @@ export default function App() {
               </Route>
               <Route path="choferes/:id" element={<ChoferDetalle />} />
               <Route path="factores" element={<Factores />} />
+              <Route path="viajes" element={<Viajes />} />
+              <Route element={<RequireRoles roles={["admin", "operador"]} />}>
+                <Route path="viajes/nuevo" element={<ViajeForm />} />
+                <Route path="viajes/:id/editar" element={<ViajeForm />} />
+              </Route>
+              <Route path="viajes/:id" element={<ViajeDetalle />} />
               <Route path="reportes" element={<Reportes />} />
               <Route element={<RequireRoles roles={["admin", "operador"]} />}>
                 <Route path="reportes/nuevo" element={<ReporteNuevo />} />
