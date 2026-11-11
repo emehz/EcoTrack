@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EcoTrack.Services;
 
-public sealed class AuthService(AppDbContext db, TokenService tokens, IntentosLogin intentos)
+public sealed class AuthService(AppDbContext db, TokenService tokens, IntentosLogin intentos, SesionVigente sesiones)
 {
     private const string CredencialesInvalidas = "Correo o contraseña incorrectos.";
     private const string HashDeRelleno = "$2a$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquzi.Ss7KIUgO2t0jWMUW";
@@ -46,7 +46,7 @@ public sealed class AuthService(AppDbContext db, TokenService tokens, IntentosLo
             : APerfil(usuario);
     }
 
-    public async Task CambiarContrasenaAsync(Guid usuarioId, ContrasenaCambiarSolicitud solicitud, CancellationToken cancelacion)
+    public async Task<LoginRespuesta> CambiarContrasenaAsync(Guid usuarioId, ContrasenaCambiarSolicitud solicitud, CancellationToken cancelacion)
     {
         var usuario = await db.Usuarios.FirstOrDefaultAsync(u => u.UsuarioId == usuarioId && u.Activo, cancelacion)
             ?? throw ApiException.NoAutenticado("Tu cuenta ya no está activa.");
@@ -71,6 +71,10 @@ public sealed class AuthService(AppDbContext db, TokenService tokens, IntentosLo
 
         usuario.HashContrasena = ContrasenaSegura.Hash(solicitud.ContrasenaNueva!);
         await db.GuardarComoAsync(usuarioId, cancelacion);
+        sesiones.Olvidar(usuarioId);
+
+        var (token, expiraEn) = tokens.Emitir(usuario);
+        return new LoginRespuesta(token, "Bearer", expiraEn, APerfil(usuario));
     }
 
     private static PerfilRespuesta APerfil(Usuario usuario) =>

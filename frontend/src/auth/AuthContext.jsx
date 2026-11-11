@@ -38,13 +38,20 @@ export function AuthProvider({ children }) {
     return () => clearTimeout(timer);
   }, [expiraEn, expirar]);
 
-  const login = useCallback(async (correo, contrasena) => {
-    const { data } = await loginRequest(correo, contrasena);
+  const iniciar = useCallback((data) => {
     saveSession({ token: data.token, expiraEn: data.expira_en });
     setExpiraEn(data.expira_en);
     setSesionExpirada(false);
     setUsuario(data.usuario);
   }, []);
+
+  const login = useCallback(
+    async (correo, contrasena) => {
+      const { data } = await loginRequest(correo, contrasena);
+      iniciar(data);
+    },
+    [iniciar],
+  );
 
   const logout = useCallback(() => {
     clearSession();
@@ -59,10 +66,11 @@ export function AuthProvider({ children }) {
       cargando,
       sesionExpirada,
       login,
+      renovar: iniciar,
       logout,
       puedeEscribir: usuario?.rol === 'admin',
     }),
-    [usuario, cargando, sesionExpirada, login, logout],
+    [usuario, cargando, sesionExpirada, login, iniciar, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
