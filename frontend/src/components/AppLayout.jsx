@@ -31,7 +31,7 @@ const SECCIONES = [
   },
   {
     titulo: "Datos de emisión",
-    items: [{ texto: "Factores", icono: Calculator }],
+    items: [{ texto: "Factores", to: "/factores", icono: Calculator }],
   },
   {
     titulo: "Reportes",
