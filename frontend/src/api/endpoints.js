@@ -16,6 +16,12 @@ export const getFactorVigente = (tipoVehiculo, tipoCombustible, signal) =>
 export const createFactor = (body) =>
   request("/factores", { method: "POST", body });
 
+export const getFactores = (params, signal) =>
+  request("/factores", { params, signal });
+
+export const sustituirFactor = (id, body) =>
+  request(`/factores/${id}/sustituir`, { method: "POST", body });
+
 export const getVehiculos = (params, signal) =>
   request("/vehiculos", { params, signal });
 
