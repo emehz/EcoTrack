@@ -43,6 +43,9 @@ Arquitectura (Opción B, IaaS): una instancia EC2 con Nginx y la API, y la base 
 
 6. Grupo de seguridad de la EC2: abrir 80 (y 443 si hay certificado) a Internet y 22 solo a las IP del equipo. La API (5070) no se abre.
 7. Grupo de seguridad de RDS: permitir 5432 solo desde el grupo de seguridad de la EC2.
+8. Almacenamiento en S3: crear el bucket privado (con "Block all public access") y asignar a la EC2 un rol IAM
+   con `s3:GetObject` y `s3:PutObject` sobre `arn:aws:s3:::NOMBRE-DEL-BUCKET/*`. En el `.env` poner
+   `ALMACENAMIENTO=s3`, `S3_BUCKET` y `AWS_REGION`. No se guardan llaves de AWS en el servidor.
 
 ## Cada despliegue
 

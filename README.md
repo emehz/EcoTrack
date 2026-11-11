@@ -110,7 +110,9 @@ ASPNETCORE_ENVIRONMENT: Development en local y Production en la EC2.
 ConnectionStrings__DefaultConnection: cadena de conexion a PostgreSQL con el usuario ecotrack_app. En AWS apunta al endpoint de RDS y agrega SSL Mode=Require.
 CORS_ORIGINS: direccion del frontend que puede llamar a la API.
 JWT_SECRET, JWT_ISSUER y JWT_AUDIENCE: firma de los tokens de sesion. JWT_SECRET debe tener al menos 32 caracteres.
+ALMACENAMIENTO: local para guardar los archivos en una carpeta, o s3 para guardarlos en el bucket.
 ALMACENAMIENTO_LOCAL_RUTA: carpeta que simula el bucket de S3, con reportes/ y resultados/.
+S3_BUCKET y AWS_REGION: bucket y region de S3 cuando ALMACENAMIENTO=s3. En la EC2 las credenciales salen del rol IAM de la instancia.
 AUDITORIA_TOLERANCIA_CO2_KG y AUDITORIA_UMBRAL_DISTANCIA_KM: parametros opcionales de la auditoria de reportes.
 
 4. BASE DE DATOS: EJECUCION DEL SCRIPT (LOCAL)

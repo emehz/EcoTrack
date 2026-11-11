@@ -58,9 +58,7 @@ builder.Services.AddScoped<FactorHistorialService>();
 builder.Services.AddScoped<ChoferService>();
 builder.Services.AddScoped<ViajeService>();
 
-var rutaAlmacenamiento = Path.Combine(
-    builder.Environment.ContentRootPath, builder.Configuration["ALMACENAMIENTO_LOCAL_RUTA"] ?? "bucket-local");
-builder.Services.AddSingleton<IAlmacenamientoArchivos>(new AlmacenamientoLocal(rutaAlmacenamiento));
+builder.Services.AgregarAlmacenamiento(builder.Configuration, builder.Environment.ContentRootPath);
 
 builder.Services.AddSingleton<SenalCalculoHuella>();
 builder.Services.AddScoped<ReporteService>();
