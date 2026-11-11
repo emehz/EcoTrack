@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5070/api/v1';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.PROD ? '/api/v1' : 'http://localhost:5070/api/v1');
 const SESSION_KEY = 'ecotrack.sesion';
 
 export class ApiError extends Error {
@@ -34,7 +35,7 @@ export function clearSession() {
 }
 
 export async function request(path, { method = 'GET', body, signal, params } = {}) {
-  const url = new URL(API_BASE_URL + path);
+  const url = new URL(API_BASE_URL + path, window.location.origin);
   Object.entries(params ?? {}).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') url.searchParams.set(key, value);
   });
