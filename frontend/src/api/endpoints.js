@@ -95,6 +95,30 @@ export const updateChofer = (id, body) =>
 export const cambiarEstadoChofer = (id, estado) =>
   request(`/choferes/${id}/estado`, { method: "PATCH", body: { estado } });
 
+export const getViajes = (params, signal) =>
+  request("/viajes", { params, signal });
+
+export const getViaje = (id, signal) => request(`/viajes/${id}`, { signal });
+
+export const createViaje = (body) =>
+  request("/viajes", { method: "POST", body });
+
+export const updateViaje = (id, body) =>
+  request(`/viajes/${id}`, { method: "PATCH", body });
+
+export const cambiarEstadoViaje = (id, body) =>
+  request(`/viajes/${id}/estado`, { method: "PATCH", body });
+
+export const deleteViaje = (id) =>
+  request(`/viajes/${id}`, { method: "DELETE", params: { confirmar: true } });
+
+export const exportarViajes = (filtros, nombre) => {
+  const params = new URLSearchParams(
+    Object.entries(filtros).filter(([, valor]) => valor),
+  );
+  return download(`/viajes/exportar?${params}`, nombre);
+};
+
 export const getUsuarios = (params, signal) =>
   request("/usuarios", { params, signal });
 
