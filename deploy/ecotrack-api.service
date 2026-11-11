@@ -1,0 +1,22 @@
+[Unit]
+Description=API de EcoTrack
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=ecotrack
+Group=ecotrack
+WorkingDirectory=/opt/ecotrack/api
+ExecStart=/usr/bin/dotnet /opt/ecotrack/api/EcoTrack.dll
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5070
+Environment=DOTNET_NOLOGO=1
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+SyslogIdentifier=ecotrack-api
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
