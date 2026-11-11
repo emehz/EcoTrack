@@ -125,6 +125,9 @@ public sealed partial class ManejadorErrores(ILogger<ManejadorErrores> logger, I
             "ux_usuario_correo_lower" => (StatusCodes.Status409Conflict, RespuestaError.Crear(
                 CodigosError.Conflicto, "Ya existe un usuario con ese correo.", contexto,
                 [new ErrorDetalle("correo", "Ya existe un usuario con este correo.")])),
+            "ux_viaje_vehiculo_salida_activo" => (StatusCodes.Status409Conflict, RespuestaError.Crear(
+                CodigosError.Conflicto, "Ya hay un viaje de este vehículo con la misma fecha y hora de salida.", contexto,
+                [new ErrorDetalle("salida_en", "Este vehículo ya tiene un viaje que sale a esa hora.")])),
             "ux_vehiculo_placa_upper" => (StatusCodes.Status409Conflict, RespuestaError.Crear(
                 CodigosError.Conflicto, "Ya existe un vehículo con esa placa.", contexto,
                 [new ErrorDetalle("placa", "Ya existe un vehículo con esta placa.")])),
