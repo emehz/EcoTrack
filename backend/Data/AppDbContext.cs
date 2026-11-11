@@ -69,9 +69,17 @@ public partial class AppDbContext(DbContextOptions<AppDbContext> options) : DbCo
 
         modelBuilder.Entity<Viaje>(entidad =>
         {
-            entidad.ToTable("viaje");
+            entidad.ToTable("viaje", tabla =>
+            {
+                tabla.HasTrigger("trg_viaje_resolver_y_calcular");
+                tabla.HasTrigger("trg_viaje_auditoria");
+            });
             entidad.HasKey(v => v.ViajeId);
             entidad.HasOne(v => v.Vehiculo).WithMany().HasForeignKey(v => v.VehiculoId);
+            entidad.HasOne(v => v.Chofer).WithMany().HasForeignKey(v => v.ChoferId);
+            entidad.HasOne(v => v.FactorEmision).WithMany().HasForeignKey(v => v.FactorEmisionId);
+            entidad.HasOne(v => v.CreadoPor).WithMany().HasForeignKey(v => v.CreadoPorUsuarioId);
+            entidad.Property(v => v.CreadoEn).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
         });
 
         modelBuilder.Entity<CargaCombustible>(entidad =>
