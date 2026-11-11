@@ -49,6 +49,8 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<IntentosLogin>();
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<SesionVigente>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<VehiculoService>();
 builder.Services.AddScoped<FactorEmisionService>();
@@ -102,6 +104,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.FromMinutes(1),
             RoleClaimType = TokenService.ClaimRol,
             NameClaimType = TokenService.ClaimSujeto,
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async contexto =>
+            {
+                var servicios = contexto.HttpContext.RequestServices;
+                var vigente = await servicios.GetRequiredService<SesionVigente>().EsValidaAsync(
+                    contexto.Principal!, servicios.GetRequiredService<AppDbContext>(), contexto.HttpContext.RequestAborted);
+                if (!vigente)
+                {
+                    contexto.Fail("La sesión ya no es válida.");
+                }
+            },
         };
     });
 builder.Services.AddAuthorization();

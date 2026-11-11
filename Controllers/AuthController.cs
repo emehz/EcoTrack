@@ -23,9 +23,7 @@ public class AuthController(AuthService auth) : ControllerBase
 
     [HttpPatch("contrasena")]
     [Authorize]
-    public async Task<IActionResult> CambiarContrasena(ContrasenaCambiarSolicitud solicitud, CancellationToken cancelacion)
-    {
-        await auth.CambiarContrasenaAsync(User.ObtenerUsuarioId(), solicitud, cancelacion);
-        return NoContent();
-    }
+    public async Task<ActionResult<RespuestaApi<LoginRespuesta>>> CambiarContrasena(
+        ContrasenaCambiarSolicitud solicitud, CancellationToken cancelacion) =>
+        new RespuestaApi<LoginRespuesta>(await auth.CambiarContrasenaAsync(User.ObtenerUsuarioId(), solicitud, cancelacion));
 }

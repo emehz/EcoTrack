@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { cambiarMiContrasena } from "../api/endpoints";
+import { useAuth } from "../auth/useAuth";
 import { DialogoFormulario } from "./DialogoFormulario";
 import { Field } from "./ui";
 import { erroresDe, validarContrasena } from "../utils/usuarios";
@@ -12,6 +13,7 @@ export function CambiarContrasena({ abierto, onCerrar }) {
   const [errores, setErrores] = useState({});
   const [errorGeneral, setErrorGeneral] = useState("");
   const [ocupado, setOcupado] = useState(false);
+  const { renovar } = useAuth();
 
   const actualizar = (campo, valor) =>
     setForm((anterior) => ({ ...anterior, [campo]: valor }));
@@ -35,9 +37,10 @@ export function CambiarContrasena({ abierto, onCerrar }) {
 
     setOcupado(true);
     try {
-      await cambiarMiContrasena(form.actual, form.nueva);
+      const { data } = await cambiarMiContrasena(form.actual, form.nueva);
+      renovar(data);
       toast.success("Contraseña actualizada", {
-        description: "Úsala la próxima vez que inicies sesión.",
+        description: "Se cerraron tus sesiones abiertas en otros equipos.",
       });
       cerrar();
     } catch (falla) {
