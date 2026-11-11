@@ -54,6 +54,7 @@ builder.Services.AddSingleton<SesionVigente>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<VehiculoService>();
 builder.Services.AddScoped<FactorEmisionService>();
+builder.Services.AddScoped<FactorHistorialService>();
 builder.Services.AddScoped<ChoferService>();
 builder.Services.AddScoped<ViajeService>();
 
