@@ -29,6 +29,7 @@ const Viajes = lazy(() => import("./pages/Viajes"));
 const ViajeForm = lazy(() => import("./pages/ViajeForm"));
 const ViajeDetalle = lazy(() => import("./pages/ViajeDetalle"));
 const Combustible = lazy(() => import("./pages/Combustible"));
+const Bitacora = lazy(() => import("./pages/Bitacora"));
 const Reportes = lazy(() => import("./pages/Reportes"));
 const ReporteNuevo = lazy(() => import("./pages/ReporteNuevo"));
 const ReporteDetalle = lazy(() => import("./pages/ReporteDetalle"));
@@ -139,6 +140,7 @@ export default function App() {
               <Route element={<RequireRoles roles={["admin", "auditor"]} />}>
                 <Route path="auditorias" element={<Auditorias />} />
                 <Route path="auditorias/:id" element={<AuditoriaDetalle />} />
+                <Route path="bitacora" element={<Bitacora />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Route>

@@ -132,13 +132,25 @@ export const updateCarga = (id, body) =>
   request(`/combustible/${id}`, { method: "PATCH", body });
 
 export const deleteCarga = (id) =>
-  request(`/combustible/${id}`, { method: "DELETE", params: { confirmar: true } });
+  request(`/combustible/${id}`, {
+    method: "DELETE",
+    params: { confirmar: true },
+  });
 
 export const getPanel = (params, signal) =>
   request("/panel", { params, signal });
 
 export const getRutasPanel = (params, signal) =>
   request("/panel/rutas", { params, signal });
+
+export const getBitacora = (params, signal) =>
+  request("/bitacora", { params, signal });
+
+export const getRegistroBitacora = (id, signal) =>
+  request(`/bitacora/${id}`, { signal });
+
+export const getUsuariosBitacora = (signal) =>
+  request("/bitacora/usuarios", { signal });
 
 export const getUsuarios = (params, signal) =>
   request("/usuarios", { params, signal });
