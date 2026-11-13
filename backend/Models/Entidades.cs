@@ -62,6 +62,10 @@ public class CargaCombustible
     public Guid CargaCombustibleId { get; set; }
     public Guid VehiculoId { get; set; }
     public Vehiculo? Vehiculo { get; set; }
+    public Guid? ViajeId { get; set; }
+    public Viaje? Viaje { get; set; }
     public DateTimeOffset CargadoEn { get; set; }
     public decimal Litros { get; set; }
+    public decimal? PrecioPorLitro { get; set; }
+    public Guid? CreadoPorUsuarioId { get; set; }
 }
