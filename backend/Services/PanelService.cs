@@ -48,6 +48,8 @@ public sealed class PanelService(AppDbContext db)
 
     private sealed record Flota(int Activos, int ElectricosHibridos);
 
+    private sealed record Ruta(string Origen, string Destino, int Viajes, decimal Km, decimal Co2);
+
     public async Task<PanelRespuesta> ObtenerAsync(PanelFiltro filtro, CancellationToken cancelacion)
     {
         var (desde, hasta, tipo, combustible) = Validar(filtro);
@@ -111,6 +113,25 @@ public sealed class PanelService(AppDbContext db)
             porTipo,
             top.Select(t => new VehiculoEmisor(t.VehiculoId, t.Placa, t.TipoVehiculo, t.TipoCombustible, t.Viajes, t.Km, t.Co2)).ToList(),
             Tendencia(desde, hasta, meses));
+    }
+
+    public async Task<IReadOnlyList<RutaEmision>> RutasAsync(PanelFiltro filtro, CancellationToken cancelacion)
+    {
+        var (desde, hasta, tipo, combustible) = Validar(filtro);
+        var rutas = await db.Database.SqlQueryRaw<Ruta>($"""
+            SELECT min(v.origen) AS "Origen", min(v.destino) AS "Destino",
+                   count(*)::int AS "Viajes", sum(v.distancia_km) AS "Km", sum(v.co2_kg) AS "Co2"
+              FROM viaje v
+              JOIN factor_emision f ON f.factor_emision_id = v.factor_emision_id
+             WHERE {Filtro}
+             GROUP BY lower(v.origen), lower(v.destino)
+             ORDER BY sum(v.co2_kg) DESC, min(v.origen)
+             LIMIT @top
+            """, [.. Parametros(desde, hasta, tipo, combustible), new NpgsqlParameter("top", filtro.Top)]).ToListAsync(cancelacion);
+
+        return rutas
+            .Select(r => new RutaEmision(r.Origen, r.Destino, r.Viajes, r.Km, r.Co2, r.Km > 0 ? Math.Round(r.Co2 / r.Km, 4) : null))
+            .ToList();
     }
 
     private static (DateOnly Desde, DateOnly Hasta, string Tipo, string Combustible) Validar(PanelFiltro filtro)

@@ -15,6 +15,8 @@ public sealed record VehiculoEmisor(
 
 public sealed record MesPanel(string Mes, decimal Co2Kg);
 
+public sealed record RutaEmision(string Origen, string Destino, int Viajes, decimal Km, decimal Co2Kg, decimal? IntensidadKgKm);
+
 public sealed record PanelRespuesta(
     PeriodoPanel Periodo,
     CifrasPanel Resumen,
