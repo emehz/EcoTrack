@@ -21,6 +21,7 @@ public partial class AppDbContext(DbContextOptions<AppDbContext> options) : DbCo
 
     public DbSet<AuditoriaReporte> AuditoriasReporte => Set<AuditoriaReporte>();
     public DbSet<HallazgoAuditoria> HallazgosAuditoria => Set<HallazgoAuditoria>();
+    public DbSet<RegistroBitacora> Bitacora => Set<RegistroBitacora>();
 
     public async Task GuardarComoAsync(Guid usuarioId, CancellationToken cancelacion)
     {
@@ -133,6 +134,15 @@ public partial class AppDbContext(DbContextOptions<AppDbContext> options) : DbCo
             entidad.HasOne(a => a.VersionFinal).WithMany().HasForeignKey(a => a.VersionFinalId);
             entidad.HasOne(a => a.Auditor).WithMany().HasForeignKey(a => a.AuditorUsuarioId);
             entidad.HasMany(a => a.Hallazgos).WithOne().HasForeignKey(h => h.AuditoriaReporteId);
+        });
+
+        modelBuilder.Entity<RegistroBitacora>(entidad =>
+        {
+            entidad.ToTable("auditoria");
+            entidad.HasKey(r => r.AuditoriaId);
+            entidad.Property(r => r.DatosAnteriores).HasColumnType("jsonb");
+            entidad.Property(r => r.DatosNuevos).HasColumnType("jsonb");
+            entidad.HasOne(r => r.Usuario).WithMany().HasForeignKey(r => r.UsuarioId);
         });
 
         modelBuilder.Entity<HallazgoAuditoria>(entidad =>
