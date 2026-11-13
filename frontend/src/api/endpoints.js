@@ -134,6 +134,12 @@ export const updateCarga = (id, body) =>
 export const deleteCarga = (id) =>
   request(`/combustible/${id}`, { method: "DELETE", params: { confirmar: true } });
 
+export const getPanel = (params, signal) =>
+  request("/panel", { params, signal });
+
+export const getRutasPanel = (params, signal) =>
+  request("/panel/rutas", { params, signal });
+
 export const getUsuarios = (params, signal) =>
   request("/usuarios", { params, signal });
 
