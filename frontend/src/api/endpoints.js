@@ -119,6 +119,21 @@ export const exportarViajes = (filtros, nombre) => {
   return download(`/viajes/exportar?${params}`, nombre);
 };
 
+export const getCargas = (params, signal) =>
+  request("/combustible", { params, signal });
+
+export const getConsumo = (params, signal) =>
+  request("/combustible/consumo", { params, signal });
+
+export const createCarga = (body) =>
+  request("/combustible", { method: "POST", body });
+
+export const updateCarga = (id, body) =>
+  request(`/combustible/${id}`, { method: "PATCH", body });
+
+export const deleteCarga = (id) =>
+  request(`/combustible/${id}`, { method: "DELETE", params: { confirmar: true } });
+
 export const getUsuarios = (params, signal) =>
   request("/usuarios", { params, signal });
 
