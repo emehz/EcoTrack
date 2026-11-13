@@ -58,6 +58,7 @@ builder.Services.AddScoped<FactorHistorialService>();
 builder.Services.AddScoped<ChoferService>();
 builder.Services.AddScoped<ViajeService>();
 builder.Services.AddScoped<CombustibleService>();
+builder.Services.AddScoped<PanelService>();
 
 builder.Services.AgregarAlmacenamiento(builder.Configuration, builder.Environment.ContentRootPath);
 
