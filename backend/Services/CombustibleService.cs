@@ -144,6 +144,68 @@ public sealed class CombustibleService(AppDbContext db, TimeProvider reloj)
         await db.GuardarComoAsync(usuarioId, cancelacion);
     }
 
+    public async Task<(IReadOnlyList<ConsumoVehiculo> Datos, TotalesConsumo Totales)> ConsumoAsync(
+        Guid? vehiculoId, DateOnly? desde, DateOnly? hasta, CancellationToken cancelacion)
+    {
+        if (desde is { } d && hasta is { } h && d > h)
+        {
+            throw ApiException.Validacion([new ErrorDetalle("hasta", "La fecha final no puede ser anterior a la inicial.")]);
+        }
+
+        var inicio = desde is { } a ? InicioDelDia(a) : DateTimeOffset.UnixEpoch;
+        var fin = hasta is { } b ? InicioDelDia(b.AddDays(1)) : new DateTimeOffset(3000, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        var vehiculo = vehiculoId ?? Guid.Empty;
+
+        var filas = await db.Database.SqlQuery<FilaConsumo>($"""
+            WITH cargas AS (
+                SELECT vehiculo_id,
+                       count(*)::int AS cargas,
+                       sum(litros) AS litros,
+                       coalesce(sum(litros * precio_por_litro) FILTER (WHERE precio_por_litro IS NOT NULL), 0) AS costo,
+                       coalesce(sum(litros) FILTER (WHERE precio_por_litro IS NULL), 0) AS litros_sin_precio
+                  FROM carga_combustible
+                 WHERE cargado_en >= {inicio} AND cargado_en < {fin}
+                 GROUP BY vehiculo_id
+            ), recorridos AS (
+                SELECT vehiculo_id, count(*)::int AS viajes, sum(distancia_km) AS km
+                  FROM viaje
+                 WHERE estado = 'completado' AND salida_en >= {inicio} AND salida_en < {fin}
+                 GROUP BY vehiculo_id
+            )
+            SELECT v.vehiculo_id AS "VehiculoId",
+                   v.placa AS "Placa",
+                   v.tipo_combustible::text AS "TipoCombustible",
+                   coalesce(c.cargas, 0) AS "Cargas",
+                   coalesce(c.litros, 0) AS "Litros",
+                   round(coalesce(c.costo, 0), 2) AS "Costo",
+                   coalesce(c.litros_sin_precio, 0) AS "LitrosSinPrecio",
+                   coalesce(r.viajes, 0) AS "Viajes",
+                   coalesce(r.km, 0) AS "Km"
+              FROM vehiculo v
+              LEFT JOIN cargas c ON c.vehiculo_id = v.vehiculo_id
+              LEFT JOIN recorridos r ON r.vehiculo_id = v.vehiculo_id
+             WHERE v.tipo_combustible <> 'electrico'
+               AND (c.vehiculo_id IS NOT NULL OR r.vehiculo_id IS NOT NULL)
+               AND ({vehiculo} = '00000000-0000-0000-0000-000000000000'::uuid OR v.vehiculo_id = {vehiculo})
+             ORDER BY coalesce(c.litros, 0) DESC, v.placa
+            """).ToListAsync(cancelacion);
+
+        var datos = filas
+            .Select(f => new ConsumoVehiculo(
+                f.VehiculoId, f.Placa, f.TipoCombustible, f.Cargas, f.Litros, f.Costo, f.LitrosSinPrecio, f.Viajes, f.Km,
+                Rendimiento(f.Km, f.Litros)))
+            .ToList();
+        var litros = datos.Sum(f => f.Litros);
+        var km = datos.Where(f => f.Litros > 0).Sum(f => f.Km);
+        return (datos, new TotalesConsumo(litros, datos.Sum(f => f.Costo), datos.Sum(f => f.Km), Rendimiento(km, litros)));
+    }
+
+    private sealed record FilaConsumo(
+        Guid VehiculoId, string Placa, string TipoCombustible, int Cargas, decimal Litros, decimal Costo, decimal LitrosSinPrecio, int Viajes, decimal Km);
+
+    private static decimal? Rendimiento(decimal km, decimal litros) =>
+        litros > 0 && km > 0 ? Math.Round(km / litros, 2) : null;
+
     private sealed record DatosCarga(Guid VehiculoId, DateTimeOffset CargadoEn, decimal Litros, decimal? Precio, Guid? ViajeId);
 
     private async Task<DatosCarga> ValidarAsync(CargaGuardarSolicitud solicitud, CancellationToken cancelacion)

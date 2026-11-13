@@ -26,6 +26,17 @@ public class CombustibleController(CombustibleService combustible) : ControllerB
         return new RespuestaApi<IReadOnlyList<CargaRespuesta>>(datos, meta);
     }
 
+    [HttpGet("consumo")]
+    public async Task<ActionResult<RespuestaApi<IReadOnlyList<ConsumoVehiculo>>>> Consumo(
+        [FromQuery(Name = "vehiculo_id")] Guid? vehiculoId,
+        [FromQuery] DateOnly? desde,
+        [FromQuery] DateOnly? hasta,
+        CancellationToken cancelacion)
+    {
+        var (datos, totales) = await combustible.ConsumoAsync(vehiculoId, desde, hasta, cancelacion);
+        return new RespuestaApi<IReadOnlyList<ConsumoVehiculo>>(datos, totales);
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<RespuestaApi<CargaRespuesta>>> Obtener(Guid id, CancellationToken cancelacion) =>
         new RespuestaApi<CargaRespuesta>(await combustible.ObtenerAsync(id, cancelacion));
