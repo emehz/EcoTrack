@@ -21,4 +21,15 @@ public class PanelController(PanelService panel) : ControllerBase
         [FromQuery] int top = 5) =>
         new RespuestaApi<PanelRespuesta>(
             await panel.ObtenerAsync(new PanelFiltro(desde, hasta, tipoVehiculo, tipoCombustible, top), cancelacion));
+
+    [HttpGet("rutas")]
+    public async Task<ActionResult<RespuestaApi<IReadOnlyList<RutaEmision>>>> Rutas(
+        [FromQuery] DateOnly? desde,
+        [FromQuery] DateOnly? hasta,
+        [FromQuery(Name = "tipo_vehiculo")] string? tipoVehiculo,
+        [FromQuery(Name = "tipo_combustible")] string? tipoCombustible,
+        CancellationToken cancelacion,
+        [FromQuery] int top = 5) =>
+        new RespuestaApi<IReadOnlyList<RutaEmision>>(
+            await panel.RutasAsync(new PanelFiltro(desde, hasta, tipoVehiculo, tipoCombustible, top), cancelacion));
 }
