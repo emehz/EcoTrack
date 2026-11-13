@@ -50,7 +50,7 @@ const SECCIONES = [
     roles: ["admin", "auditor"],
     items: [
       { texto: "Usuarios", to: "/usuarios", icono: Users, roles: ["admin"] },
-      { texto: "Bitácora", icono: ScrollText },
+      { texto: "Bitácora", to: "/bitacora", icono: ScrollText },
     ],
   },
 ];
