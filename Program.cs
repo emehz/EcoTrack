@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 
 DotNetEnv.Env.TraversePath().Load();
 
@@ -130,7 +131,7 @@ var origenes = (builder.Configuration["CORS_ORIGINS"] ?? "http://localhost:5173"
 builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy => policy.WithOrigins(origenes).AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(opciones => opciones.AddDocumentTransformer<DocumentacionApi>());
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ManejadorErrores>();
 
@@ -147,6 +148,7 @@ app.UseStatusCodePages(ManejadorErrores.EscribirEstadoAsync);
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference(opciones => opciones.WithTitle("EcoTrack API"));
 }
 
 app.UseCors();
