@@ -160,11 +160,15 @@ SELECT count(*) FROM ecotrack.viaje;             (10)
 
 Los usuarios semilla (admin@ecotrack.sv, operador@ecotrack.sv y auditor@ecotrack.sv) usan una contrasena de prueba y existen solo para desarrollo. Deben eliminarse o cambiarse antes de usar datos reales.
 
-4.6 Reinicio de la base de datos (solo desarrollo)
+4.6 Tabla de sesiones
+
+Despues de ecotrack_unificado.sql se ejecuta database/sesiones.sql sobre la misma base (en pgAdmin: Query Tool, abrir el archivo y F5). Crea la tabla ecotrack.sesion, donde la API guarda el hash de los refresh tokens. Se puede ejecutar mas de una vez sin errores. Sin esta tabla no se puede iniciar sesion.
+
+4.7 Reinicio de la base de datos (solo desarrollo)
 
 Para volver a empezar desde cero:
 
 DROP SCHEMA IF EXISTS ecotrack CASCADE;
 DROP ROLE IF EXISTS ecotrack_app;
 
-Luego se vuelve a ejecutar el script completo. Esto elimina todos los datos.
+Luego se vuelve a ejecutar el script completo y despues database/sesiones.sql. Esto elimina todos los datos.
