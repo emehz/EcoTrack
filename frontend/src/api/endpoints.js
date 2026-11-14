@@ -3,6 +3,8 @@ import { download, request } from "./client";
 export const login = (correo, contrasena) =>
   request("/auth/login", { method: "POST", body: { correo, contrasena } });
 
+export const logout = () => request("/auth/logout", { method: "POST" });
+
 export const getPerfil = (signal) => request("/auth/perfil", { signal });
 
 export const getCatalogos = (signal) => request("/catalogos", { signal });
