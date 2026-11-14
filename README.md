@@ -107,7 +107,7 @@ La API (.NET) lee su configuracion con la libreria DotNetEnv desde un archivo .e
 Para configurar un entorno se copia .env.example como .env y se completan sus valores:
 
 ASPNETCORE_ENVIRONMENT: Development en local y Production en la EC2.
-ConnectionStrings__DefaultConnection: cadena de conexion a PostgreSQL con el usuario ecotrack_app. En AWS apunta al endpoint de RDS y agrega SSL Mode=Require.
+ConnectionStrings\_\_DefaultConnection: cadena de conexion a PostgreSQL con el usuario ecotrack_app. En AWS apunta al endpoint de RDS y agrega SSL Mode=Require.
 CORS_ORIGINS: direccion del frontend que puede llamar a la API.
 JWT_SECRET, JWT_ISSUER y JWT_AUDIENCE: firma de los tokens de sesion. JWT_SECRET debe tener al menos 32 caracteres.
 ALMACENAMIENTO: local para guardar los archivos en una carpeta, o s3 para guardarlos en el bucket.
@@ -133,7 +133,7 @@ IMPORTANTE: el script debe ejecutarse sobre una base de datos NUEVA y VACIA. No 
 - pgAdmin 4 o el cliente psql.
 - Un usuario con permisos para crear esquemas, extensiones y roles (por ejemplo, postgres).
 
-4.2 Ejecucion con pgAdmin 4
+  4.2 Ejecucion con pgAdmin 4
 
 1. Crear una base de datos nueva llamada ecotrack_db (clic derecho en Databases > Create > Database).
 2. Abrir Query Tool sobre ecotrack_db.
@@ -150,11 +150,11 @@ La opcion -v ON_ERROR_STOP=1 detiene la ejecucion en el primer error.
 
 Las tablas estan en el schema ecotrack, por lo que se consultan con ese prefijo:
 
-\dt ecotrack.*                                   (debe listar 14 tablas)
-SELECT count(*) FROM ecotrack.usuario;           (3)
-SELECT count(*) FROM ecotrack.factor_emision;    (18)
-SELECT count(*) FROM ecotrack.vehiculo;          (10)
-SELECT count(*) FROM ecotrack.viaje;             (10)
+\dt ecotrack._ (debe listar 14 tablas)
+SELECT count(_) FROM ecotrack.usuario; (3)
+SELECT count(_) FROM ecotrack.factor_emision; (18)
+SELECT count(_) FROM ecotrack.vehiculo; (10)
+SELECT count(\*) FROM ecotrack.viaje; (10)
 
 4.5 Datos de prueba
 
@@ -164,7 +164,16 @@ Los usuarios semilla (admin@ecotrack.sv, operador@ecotrack.sv y auditor@ecotrack
 
 Despues de ecotrack_unificado.sql se ejecuta database/sesiones.sql sobre la misma base (en pgAdmin: Query Tool, abrir el archivo y F5). Crea la tabla ecotrack.sesion, donde la API guarda el hash de los refresh tokens. Se puede ejecutar mas de una vez sin errores. Sin esta tabla no se puede iniciar sesion.
 
-4.7 Reinicio de la base de datos (solo desarrollo)
+4.7 Documentacion de la API
+
+Con ASPNETCORE_ENVIRONMENT=Development, la API publica su documentacion OpenAPI:
+
+http://localhost:5070/openapi/v1.json (documento OpenAPI, se puede importar en Postman)
+http://localhost:5070/scalar (documentacion interactiva para probar cada endpoint)
+
+Para probar los endpoints protegidos se inicia sesion con POST /api/v1/auth/login, se copia el token y se pega en la autenticacion Bearer. En produccion la documentacion no se publica.
+
+4.8 Reinicio de la base de datos (solo desarrollo)
 
 Para volver a empezar desde cero:
 
