@@ -10,7 +10,7 @@ namespace EcoTrack.Services;
 public sealed record JwtOpciones(string Secreto, string Emisor, string Audiencia, int MinutosDeVida)
 {
     private const int BytesMinimos = 32;
-    private const int MinutosMaximos = 60;
+    private const int MinutosMaximos = 15;
 
     public static JwtOpciones Desde(IConfiguration configuracion)
     {

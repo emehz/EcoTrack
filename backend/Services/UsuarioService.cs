@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EcoTrack.Services;
 
-public sealed partial class UsuarioService(AppDbContext db, SesionVigente sesiones)
+public sealed partial class UsuarioService(AppDbContext db, SesionVigente sesiones, SesionService refrescos)
 {
     public const int LimiteMaximo = 100;
     private const int LargoMaximo = 80;
@@ -183,6 +183,11 @@ public sealed partial class UsuarioService(AppDbContext db, SesionVigente sesion
         usuario.Activo = solicitud.Activo.Value;
         await db.GuardarComoAsync(autorId, cancelacion);
         sesiones.Olvidar(id);
+        if (!usuario.Activo)
+        {
+            await refrescos.RevocarUsuarioAsync(id, cancelacion);
+        }
+
         return await ObtenerAsync(id, cancelacion);
     }
 
@@ -200,6 +205,7 @@ public sealed partial class UsuarioService(AppDbContext db, SesionVigente sesion
         usuario.HashContrasena = ContrasenaSegura.Hash(solicitud.ContrasenaNueva!);
         await db.GuardarComoAsync(autorId, cancelacion);
         sesiones.Olvidar(id);
+        await refrescos.RevocarUsuarioAsync(id, cancelacion);
     }
 
     private async Task ExigirOtroAdministradorAsync(Guid id, string mensaje, CancellationToken cancelacion)

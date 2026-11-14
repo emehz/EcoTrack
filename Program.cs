@@ -51,6 +51,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<IntentosLogin>();
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<SesionVigente>();
+builder.Services.AddScoped<SesionService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<VehiculoService>();
 builder.Services.AddScoped<FactorEmisionService>();
@@ -127,7 +128,7 @@ builder.Services.AddAuthorization();
 var origenes = (builder.Configuration["CORS_ORIGINS"] ?? "http://localhost:5173")
     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 builder.Services.AddCors(options =>
-    options.AddDefaultPolicy(policy => policy.WithOrigins(origenes).AllowAnyHeader().AllowAnyMethod()));
+    options.AddDefaultPolicy(policy => policy.WithOrigins(origenes).AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
 
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();

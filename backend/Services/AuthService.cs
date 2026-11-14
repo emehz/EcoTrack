@@ -32,6 +32,11 @@ public sealed class AuthService(AppDbContext db, TokenService tokens, IntentosLo
         }
 
         intentos.Limpiar(clave);
+        return Respuesta(usuario);
+    }
+
+    public LoginRespuesta Respuesta(Usuario usuario)
+    {
         var (token, expiraEn) = tokens.Emitir(usuario);
         return new LoginRespuesta(token, "Bearer", expiraEn, APerfil(usuario));
     }
@@ -73,8 +78,7 @@ public sealed class AuthService(AppDbContext db, TokenService tokens, IntentosLo
         await db.GuardarComoAsync(usuarioId, cancelacion);
         sesiones.Olvidar(usuarioId);
 
-        var (token, expiraEn) = tokens.Emitir(usuario);
-        return new LoginRespuesta(token, "Bearer", expiraEn, APerfil(usuario));
+        return Respuesta(usuario);
     }
 
     private static PerfilRespuesta APerfil(Usuario usuario) =>

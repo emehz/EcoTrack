@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Security.Claims;
 using EcoTrack.Data;
 using EcoTrack.Models;
@@ -9,6 +10,7 @@ namespace EcoTrack.Services;
 public sealed class SesionVigente(IMemoryCache cache)
 {
     private static readonly TimeSpan Duracion = TimeSpan.FromSeconds(30);
+    private readonly ConcurrentDictionary<Guid, long> versiones = new();
 
     private sealed record EstadoCuenta(bool Activo, RolUsuario Rol, string Sello);
 
@@ -42,7 +44,7 @@ public sealed class SesionVigente(IMemoryCache cache)
             && estado.Sello == principal.FindFirstValue(TokenService.ClaimSello);
     }
 
-    public void Olvidar(Guid usuarioId) => cache.Remove(Clave(usuarioId));
+    public void Olvidar(Guid usuarioId) => versiones.AddOrUpdate(usuarioId, 1, (_, version) => version + 1);
 
-    private static string Clave(Guid usuarioId) => $"sesion:{usuarioId}";
+    private string Clave(Guid usuarioId) => $"sesion:{usuarioId}:{versiones.GetValueOrDefault(usuarioId)}";
 }
