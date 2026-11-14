@@ -1,0 +1,2501 @@
+{
+  "info": {
+    "name": "EcoTrack API",
+    "description": "Todos los módulos de la API de EcoTrack. Ejecuta las carpetas 01 a 12 en orden con el Runner: crean sus propios datos de prueba y al final los dan de baja. La carpeta 13 cambia contraseñas o factores y se usa a mano.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "token_auditor",
+      "value": ""
+    },
+    {
+      "key": "vehiculo_id",
+      "value": ""
+    },
+    {
+      "key": "chofer_id",
+      "value": ""
+    },
+    {
+      "key": "factor_id",
+      "value": ""
+    },
+    {
+      "key": "viaje_id",
+      "value": ""
+    },
+    {
+      "key": "carga_id",
+      "value": ""
+    },
+    {
+      "key": "reporte_id",
+      "value": ""
+    },
+    {
+      "key": "auditoria_id",
+      "value": ""
+    },
+    {
+      "key": "hallazgo_id",
+      "value": ""
+    },
+    {
+      "key": "usuario_id",
+      "value": ""
+    },
+    {
+      "key": "bitacora_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Sesión",
+      "item": [
+        {
+          "name": "Salud de la API",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Base de datos conectada', () => pm.expect(pm.response.json().data.base_de_datos).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Iniciar sesión (auditor)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('token_auditor', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correo_auditor}}\",\n  \"contrasena\": \"{{contrasena_auditor}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Iniciar sesión (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('token', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Devuelve el token de acceso (15 minutos) y deja la cookie ecotrack_refresh para renovarlo. Va después del auditor porque Postman guarda una sola cookie por dominio.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correo}}\",\n  \"contrasena\": \"{{contrasena}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Mi perfil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es administrador', () => pm.expect(pm.response.json().data.rol).to.eql('admin'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/perfil",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "perfil"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Renovar sesión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('token', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Usa la cookie ecotrack_refresh que dejó el login. Rota la cookie y entrega un token nuevo.",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Catálogos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/catalogos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "catalogos"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Vehículos",
+      "item": [
+        {
+          "name": "Listar vehículos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/vehiculos?estado=activo&page=1&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vehiculos"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "activo"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar vehículo",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('placa', 'C ' + (10000 + Math.floor(Math.random() * 89999)));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('vehiculo_id', pm.response.json().data.vehiculo_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/vehiculos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vehiculos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"{{placa}}\",\n  \"tipo_vehiculo\": \"camion\",\n  \"tipo_combustible\": \"diesel\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Detalle del vehículo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/vehiculos/{{vehiculo_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vehiculos",
+                "{{vehiculo_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Editar vehículo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/vehiculos/{{vehiculo_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vehiculos",
+                "{{vehiculo_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo_vehiculo\": \"camion\",\n  \"tipo_combustible\": \"diesel\",\n  \"estado\": \"activo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Choferes",
+      "item": [
+        {
+          "name": "Listar choferes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/choferes?estado=activo&q=&page=1&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "choferes"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "activo"
+                },
+                {
+                  "key": "q",
+                  "value": ""
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar chofer",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('licencia', 'LIC-' + Date.now().toString().slice(-9));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('chofer_id', pm.response.json().data.chofer_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/choferes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "choferes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Mario\",\n  \"apellidos\": \"Prueba Postman\",\n  \"numero_licencia\": \"{{licencia}}\",\n  \"telefono\": \"7012-3456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Detalle del chofer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/choferes/{{chofer_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "choferes",
+                "{{chofer_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Editar chofer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/choferes/{{chofer_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "choferes",
+                "{{chofer_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Mario José\",\n  \"apellidos\": \"Prueba Postman\",\n  \"numero_licencia\": \"{{licencia}}\",\n  \"telefono\": \"7012-3456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Factores de emisión",
+      "item": [
+        {
+          "name": "Factor vigente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('factor_id', pm.response.json().data.factor_emision_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/factores/vigente?tipo_vehiculo=camion&tipo_combustible=diesel",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "factores",
+                "vigente"
+              ],
+              "query": [
+                {
+                  "key": "tipo_vehiculo",
+                  "value": "camion"
+                },
+                {
+                  "key": "tipo_combustible",
+                  "value": "diesel"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Historial de factores",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/factores?vigencia=todos&page=1&limit=50",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "factores"
+              ],
+              "query": [
+                {
+                  "key": "vigencia",
+                  "value": "todos"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detalle del factor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/factores/{{factor_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "factores",
+                "{{factor_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Viajes",
+      "item": [
+        {
+          "name": "Listar viajes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/viajes?estado=todos&page=1&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "viajes"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "todos"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar salida",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('salida_en', new Date(Date.now() - 2 * 3600 * 1000).toISOString());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('viaje_id', pm.response.json().data.viaje.viaje_id);",
+                  "pm.test('Calcula el CO2', () => pm.expect(pm.response.json().data.viaje.co2_kg).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/viajes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "viajes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehiculo_id\": \"{{vehiculo_id}}\",\n  \"chofer_id\": \"{{chofer_id}}\",\n  \"origen\": \"San Salvador\",\n  \"destino\": \"Santa Ana\",\n  \"salida_en\": \"{{salida_en}}\",\n  \"distancia_km\": 64.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Detalle del viaje",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/viajes/{{viaje_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "viajes",
+                "{{viaje_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Editar viaje",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/viajes/{{viaje_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "viajes",
+                "{{viaje_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehiculo_id\": \"{{vehiculo_id}}\",\n  \"chofer_id\": \"{{chofer_id}}\",\n  \"origen\": \"San Salvador\",\n  \"destino\": \"Santa Ana\",\n  \"salida_en\": \"{{salida_en}}\",\n  \"distancia_km\": 66\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Registrar llegada",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('llegada_en', new Date().toISOString());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/viajes/{{viaje_id}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "viajes",
+                "{{viaje_id}}",
+                "estado"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"completado\",\n  \"llegada_en\": \"{{llegada_en}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Exportar viajes a CSV",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un CSV', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('text/csv'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/viajes/exportar?estado=completado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "viajes",
+                "exportar"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "completado"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Combustible",
+      "item": [
+        {
+          "name": "Listar cargas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/combustible?page=1&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "combustible"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar carga",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('carga_id', pm.response.json().data.carga_combustible_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/combustible",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "combustible"
+              ]
+            },
+            "description": "La API recibe litros. 151.42 L son 40 galones.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehiculo_id\": \"{{vehiculo_id}}\",\n  \"cargado_en\": \"{{llegada_en}}\",\n  \"litros\": 151.42,\n  \"precio_por_litro\": 1.1888,\n  \"viaje_id\": \"{{viaje_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Detalle de la carga",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/combustible/{{carga_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "combustible",
+                "{{carga_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Corregir carga",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/combustible/{{carga_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "combustible",
+                "{{carga_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehiculo_id\": \"{{vehiculo_id}}\",\n  \"cargado_en\": \"{{llegada_en}}\",\n  \"litros\": 150,\n  \"precio_por_litro\": 1.19,\n  \"viaje_id\": \"{{viaje_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Consumo por vehículo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/combustible/consumo?vehiculo_id={{vehiculo_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "combustible",
+                "consumo"
+              ],
+              "query": [
+                {
+                  "key": "vehiculo_id",
+                  "value": "{{vehiculo_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar carga",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/combustible/{{carga_id}}?confirmar=true",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "combustible",
+                "{{carga_id}}"
+              ],
+              "query": [
+                {
+                  "key": "confirmar",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Panel",
+      "item": [
+        {
+          "name": "Indicadores del panel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/panel?top=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "panel"
+              ],
+              "query": [
+                {
+                  "key": "top",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Rutas con más emisiones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/panel/rutas?top=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "panel",
+                "rutas"
+              ],
+              "query": [
+                {
+                  "key": "top",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Reportes",
+      "item": [
+        {
+          "name": "Listar reportes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reportes?page=1&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reportes"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Generar reporte",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('hoy', new Date().toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('reporte_id', pm.response.json().data.reporte_viaje_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reportes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reportes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"desde\": \"2025-01-01\",\n  \"hasta\": \"{{hoy}}\",\n  \"solo_completados\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Detalle del reporte",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "setTimeout(() => {}, 2000);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reportes/{{reporte_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reportes",
+                "{{reporte_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filas de la versión 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reportes/{{reporte_id}}/versiones/1/filas?page=1&limit=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reportes",
+                "{{reporte_id}}",
+                "versiones",
+                "1",
+                "filas"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Descargar CSV de la versión 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reportes/{{reporte_id}}/versiones/1/csv",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reportes",
+                "{{reporte_id}}",
+                "versiones",
+                "1",
+                "csv"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 Auditorías",
+      "item": [
+        {
+          "name": "Iniciar auditoría (auditor)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('auditoria_id', pm.response.json().data.auditoria_reporte_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reportes/{{reporte_id}}/auditorias",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reportes",
+                "{{reporte_id}}",
+                "auditorias"
+              ]
+            },
+            "description": "Quien generó el reporte no puede auditarlo; por eso se usa el token del auditor.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alcance\": \"Revisión completa del periodo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_auditor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar auditorías",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auditorias?page=1&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auditorias"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_auditor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detalle de la auditoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auditorias/{{auditoria_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auditorias",
+                "{{auditoria_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_auditor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar hallazgo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('hallazgo_id', pm.response.json().data.hallazgo_auditoria_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auditorias/{{auditoria_id}}/hallazgos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auditorias",
+                "{{auditoria_id}}",
+                "hallazgos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fila_numero\": 2,\n  \"campo\": \"origen\",\n  \"severidad\": \"baja\",\n  \"descripcion\": \"Origen escrito con abreviatura\",\n  \"valor_encontrado\": \"S.S.\",\n  \"valor_esperado\": \"San Salvador\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_auditor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Descartar hallazgo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auditorias/{{auditoria_id}}/hallazgos/{{hallazgo_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auditorias",
+                "{{auditoria_id}}",
+                "hallazgos",
+                "{{hallazgo_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"descartado\",\n  \"justificacion\": \"Prueba de la colección\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_auditor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 Usuarios",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/usuarios?estado=activo&page=1&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "activo"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar usuario",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('correo_nuevo', 'postman' + Date.now() + '@ecotrack.sv');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('usuario_id', pm.response.json().data.usuario_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correo_nuevo}}\",\n  \"nombres\": \"Usuario\",\n  \"apellidos\": \"De Prueba\",\n  \"rol\": \"operador\",\n  \"contrasena\": \"Prueba2026x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Detalle del usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/usuarios/{{usuario_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuario_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Editar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/usuarios/{{usuario_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuario_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Usuario\",\n  \"apellidos\": \"De Prueba\",\n  \"rol\": \"auditor\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 Bitácora",
+      "item": [
+        {
+          "name": "Consultar bitácora",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('bitacora_id', pm.response.json().data[0].auditoria_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/bitacora?entidad=viaje&page=1&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bitacora"
+              ],
+              "query": [
+                {
+                  "key": "entidad",
+                  "value": "viaje"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_auditor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Usuarios en la bitácora",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/bitacora/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bitacora",
+                "usuarios"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_auditor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detalle con antes y después",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/bitacora/{{bitacora_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "bitacora",
+                "{{bitacora_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_auditor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 Limpieza",
+      "item": [
+        {
+          "name": "Eliminar viaje de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/viajes/{{viaje_id}}?confirmar=true",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "viajes",
+                "{{viaje_id}}"
+              ],
+              "query": [
+                {
+                  "key": "confirmar",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Suspender chofer de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/choferes/{{chofer_id}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "choferes",
+                "{{chofer_id}}",
+                "estado"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"inactivo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Dar de baja el vehículo de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/vehiculos/{{vehiculo_id}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vehiculos",
+                "{{vehiculo_id}}",
+                "estado"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"inactivo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Desactivar usuario de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/usuarios/{{usuario_id}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuario_id}}",
+                "estado"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activo\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cerrar sesión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 Manual (cambia contraseñas o factores)",
+      "item": [
+        {
+          "name": "Cambiar mi contraseña",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/contrasena",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "contrasena"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contrasena_actual\": \"{{contrasena}}\",\n  \"contrasena_nueva\": \"escribe-la-nueva\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Restablecer contraseña de un usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/usuarios/{{usuario_id}}/contrasena",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuario_id}}",
+                "contrasena"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contrasena_nueva\": \"escribe-la-nueva\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Crear factor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/factores",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "factores"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo_vehiculo\": \"otro\",\n  \"tipo_combustible\": \"otro\",\n  \"factor_co2_km\": 0.5,\n  \"fuente\": \"Fuente del factor\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Sustituir factor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/factores/{{factor_id}}/sustituir",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "factores",
+                "{{factor_id}}",
+                "sustituir"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"factor_co2_km\": 0.9,\n  \"vigente_desde\": \"2027-01-01\",\n  \"fuente\": \"Fuente del factor nuevo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Reprocesar versión fallida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 202', () => pm.response.to.have.status(202));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reportes/{{reporte_id}}/versiones/1/reprocesar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reportes",
+                "{{reporte_id}}",
+                "versiones",
+                "1",
+                "reprocesar"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cerrar auditoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auditorias/{{auditoria_id}}/cerrar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auditorias",
+                "{{auditoria_id}}",
+                "cerrar"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resultado\": \"aprobado\",\n  \"conclusion\": \"El reporte coincide con los viajes registrados.\",\n  \"version_final\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_auditor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "description": "No se ejecuta en el Runner: cambia contraseñas, factores o cierra auditorías. Ajusta los valores antes de enviar."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+.ancho {
+  width: min(760px, calc(100vw - 32px));
+}
+
+.cambios {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.cambios th,
+.cambios td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--linea);
+  text-align: left;
+  vertical-align: top;
+}
+
+.cambios thead th {
+  border-bottom: 2px solid var(--tinta);
+  font-size: 13px;
+  color: var(--tinta-media);
+}
+
+.cambios tbody th {
+  font-family: var(--mono);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.valor {
+  overflow-wrap: anywhere;
+}
+
+.antes {
+  color: var(--tinta-media);
+  text-decoration: line-through;
+}

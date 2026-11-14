@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 
 DotNetEnv.Env.TraversePath().Load();
 
@@ -46,14 +47,23 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }));
 
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<IntentosLogin>();
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<SesionVigente>();
+builder.Services.AddScoped<SesionService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<VehiculoService>();
 builder.Services.AddScoped<FactorEmisionService>();
+builder.Services.AddScoped<FactorHistorialService>();
 builder.Services.AddScoped<ChoferService>();
+builder.Services.AddScoped<ViajeService>();
+builder.Services.AddScoped<CombustibleService>();
+builder.Services.AddScoped<PanelService>();
+builder.Services.AddScoped<BitacoraService>();
 
-var rutaAlmacenamiento = Path.Combine(
-    builder.Environment.ContentRootPath, builder.Configuration["ALMACENAMIENTO_LOCAL_RUTA"] ?? "bucket-local");
-builder.Services.AddSingleton<IAlmacenamientoArchivos>(new AlmacenamientoLocal(rutaAlmacenamiento));
+builder.Services.AgregarAlmacenamiento(builder.Configuration, builder.Environment.ContentRootPath);
 
 builder.Services.AddSingleton<SenalCalculoHuella>();
 builder.Services.AddScoped<ReporteService>();
@@ -100,15 +110,28 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             RoleClaimType = TokenService.ClaimRol,
             NameClaimType = TokenService.ClaimSujeto,
         };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async contexto =>
+            {
+                var servicios = contexto.HttpContext.RequestServices;
+                var vigente = await servicios.GetRequiredService<SesionVigente>().EsValidaAsync(
+                    contexto.Principal!, servicios.GetRequiredService<AppDbContext>(), contexto.HttpContext.RequestAborted);
+                if (!vigente)
+                {
+                    contexto.Fail("La sesión ya no es válida.");
+                }
+            },
+        };
     });
 builder.Services.AddAuthorization();
 
 var origenes = (builder.Configuration["CORS_ORIGINS"] ?? "http://localhost:5173")
     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 builder.Services.AddCors(options =>
-    options.AddDefaultPolicy(policy => policy.WithOrigins(origenes).AllowAnyHeader().AllowAnyMethod()));
+    options.AddDefaultPolicy(policy => policy.WithOrigins(origenes).AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(opciones => opciones.AddDocumentTransformer<DocumentacionApi>());
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ManejadorErrores>();
 
@@ -125,6 +148,7 @@ app.UseStatusCodePages(ManejadorErrores.EscribirEstadoAsync);
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference(opciones => opciones.WithTitle("EcoTrack API"));
 }
 
 app.UseCors();

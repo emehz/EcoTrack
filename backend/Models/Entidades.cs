@@ -40,10 +40,21 @@ public class Viaje
     public Guid ViajeId { get; set; }
     public Guid VehiculoId { get; set; }
     public Vehiculo? Vehiculo { get; set; }
+    public Guid? ChoferId { get; set; }
+    public Chofer? Chofer { get; set; }
+    public string Origen { get; set; } = string.Empty;
+    public string Destino { get; set; } = string.Empty;
     public DateTimeOffset SalidaEn { get; set; }
+    public DateTimeOffset? LlegadaEn { get; set; }
     public decimal DistanciaKm { get; set; }
+    public Guid? FactorEmisionId { get; set; }
+    public FactorEmision? FactorEmision { get; set; }
     public decimal Co2Kg { get; set; }
     public EstadoViaje Estado { get; set; }
+    public Guid? CargaArchivoId { get; set; }
+    public Guid? CreadoPorUsuarioId { get; set; }
+    public Usuario? CreadoPor { get; set; }
+    public DateTimeOffset CreadoEn { get; set; }
 }
 
 public class CargaCombustible
@@ -51,6 +62,10 @@ public class CargaCombustible
     public Guid CargaCombustibleId { get; set; }
     public Guid VehiculoId { get; set; }
     public Vehiculo? Vehiculo { get; set; }
+    public Guid? ViajeId { get; set; }
+    public Viaje? Viaje { get; set; }
     public DateTimeOffset CargadoEn { get; set; }
     public decimal Litros { get; set; }
+    public decimal? PrecioPorLitro { get; set; }
+    public Guid? CreadoPorUsuarioId { get; set; }
 }

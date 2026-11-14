@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
 using System.Security.Claims;
 using System.Text;
 using EcoTrack.Models;
@@ -9,7 +10,7 @@ namespace EcoTrack.Services;
 public sealed record JwtOpciones(string Secreto, string Emisor, string Audiencia, int MinutosDeVida)
 {
     private const int BytesMinimos = 32;
-    private const int MinutosMaximos = 60;
+    private const int MinutosMaximos = 15;
 
     public static JwtOpciones Desde(IConfiguration configuracion)
     {
@@ -31,6 +32,10 @@ public sealed class TokenService(JwtOpciones opciones)
 {
     public const string ClaimSujeto = JwtRegisteredClaimNames.Sub;
     public const string ClaimRol = "rol";
+    public const string ClaimSello = "sello";
+
+    public static string Sello(string hashContrasena) =>
+        Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(hashContrasena)))[..16];
 
     public (string Token, DateTimeOffset ExpiraEn) Emitir(Usuario usuario)
     {
@@ -45,6 +50,7 @@ public sealed class TokenService(JwtOpciones opciones)
             [
                 new Claim(ClaimSujeto, usuario.UsuarioId.ToString()),
                 new Claim(ClaimRol, Nombres.DeRol(usuario.Rol)),
+                new Claim(ClaimSello, Sello(usuario.HashContrasena)),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             ],
             expires: expiraEn.UtcDateTime,

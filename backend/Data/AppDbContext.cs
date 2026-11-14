@@ -21,6 +21,8 @@ public partial class AppDbContext(DbContextOptions<AppDbContext> options) : DbCo
 
     public DbSet<AuditoriaReporte> AuditoriasReporte => Set<AuditoriaReporte>();
     public DbSet<HallazgoAuditoria> HallazgosAuditoria => Set<HallazgoAuditoria>();
+    public DbSet<RegistroBitacora> Bitacora => Set<RegistroBitacora>();
+    public DbSet<Sesion> Sesiones => Set<Sesion>();
 
     public async Task GuardarComoAsync(Guid usuarioId, CancellationToken cancelacion)
     {
@@ -69,16 +71,29 @@ public partial class AppDbContext(DbContextOptions<AppDbContext> options) : DbCo
 
         modelBuilder.Entity<Viaje>(entidad =>
         {
-            entidad.ToTable("viaje");
+            entidad.ToTable("viaje", tabla =>
+            {
+                tabla.HasTrigger("trg_viaje_resolver_y_calcular");
+                tabla.HasTrigger("trg_viaje_auditoria");
+            });
             entidad.HasKey(v => v.ViajeId);
             entidad.HasOne(v => v.Vehiculo).WithMany().HasForeignKey(v => v.VehiculoId);
+            entidad.HasOne(v => v.Chofer).WithMany().HasForeignKey(v => v.ChoferId);
+            entidad.HasOne(v => v.FactorEmision).WithMany().HasForeignKey(v => v.FactorEmisionId);
+            entidad.HasOne(v => v.CreadoPor).WithMany().HasForeignKey(v => v.CreadoPorUsuarioId);
+            entidad.Property(v => v.CreadoEn).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
         });
 
         modelBuilder.Entity<CargaCombustible>(entidad =>
         {
-            entidad.ToTable("carga_combustible");
+            entidad.ToTable("carga_combustible", tabla =>
+            {
+                tabla.HasTrigger("trg_carga_combustible_validar");
+                tabla.HasTrigger("trg_carga_combustible_auditoria");
+            });
             entidad.HasKey(c => c.CargaCombustibleId);
             entidad.HasOne(c => c.Vehiculo).WithMany().HasForeignKey(c => c.VehiculoId);
+            entidad.HasOne(c => c.Viaje).WithMany().HasForeignKey(c => c.ViajeId);
         });
 
         modelBuilder.Entity<ReporteViaje>(entidad =>
@@ -120,6 +135,22 @@ public partial class AppDbContext(DbContextOptions<AppDbContext> options) : DbCo
             entidad.HasOne(a => a.VersionFinal).WithMany().HasForeignKey(a => a.VersionFinalId);
             entidad.HasOne(a => a.Auditor).WithMany().HasForeignKey(a => a.AuditorUsuarioId);
             entidad.HasMany(a => a.Hallazgos).WithOne().HasForeignKey(h => h.AuditoriaReporteId);
+        });
+
+        modelBuilder.Entity<Sesion>(entidad =>
+        {
+            entidad.ToTable("sesion");
+            entidad.HasKey(s => s.SesionId);
+            entidad.HasOne(s => s.Usuario).WithMany().HasForeignKey(s => s.UsuarioId);
+        });
+
+        modelBuilder.Entity<RegistroBitacora>(entidad =>
+        {
+            entidad.ToTable("auditoria");
+            entidad.HasKey(r => r.AuditoriaId);
+            entidad.Property(r => r.DatosAnteriores).HasColumnType("jsonb");
+            entidad.Property(r => r.DatosNuevos).HasColumnType("jsonb");
+            entidad.HasOne(r => r.Usuario).WithMany().HasForeignKey(r => r.UsuarioId);
         });
 
         modelBuilder.Entity<HallazgoAuditoria>(entidad =>
