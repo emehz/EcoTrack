@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { clsx } from 'clsx';
+import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { getFactores } from '../api/endpoints';
 import { useAuth } from '../auth/useAuth';
+import { FactorDialog } from '../components/FactorDialog';
 import { Paginacion } from '../components/Paginacion';
 import { Selector } from '../components/Selector';
 import { SustituirFactor } from '../components/SustituirFactor';
@@ -25,6 +28,7 @@ export default function Factores() {
   const [respuesta, setRespuesta] = useState({ clave: null });
   const [recarga, setRecarga] = useState(0);
   const [aSustituir, setASustituir] = useState(null);
+  const [creando, setCreando] = useState(false);
 
   const clave = JSON.stringify({ vigencia, combustible, tipo, page, recarga });
 
@@ -64,7 +68,13 @@ export default function Factores() {
       <PageHeader
         titulo="Factores de emisión"
         subtitulo="Kilogramos de CO₂ por kilómetro según el combustible y el tipo de vehículo. Cada viaje guarda el factor con el que se calculó."
-      />
+      >
+        {puedeEscribir && (
+          <Button icon={Plus} onClick={() => setCreando(true)}>
+            Crear factor
+          </Button>
+        )}
+      </PageHeader>
 
       <div className={styles.pestanas} role="group" aria-label="Filtrar por vigencia">
         {VIGENCIAS.map(({ valor, texto }) => (
@@ -171,6 +181,19 @@ export default function Factores() {
       )}
 
       {!error && <Paginacion meta={meta} onCambiar={(pagina) => cambiar({ page: String(pagina) })} />}
+
+      <FactorDialog
+        abierto={creando}
+        catalogos={catalogos}
+        onCerrar={() => setCreando(false)}
+        onCreado={(factor) => {
+          setCreando(false);
+          toast.success('Factor creado', {
+            description: `${combinacion(factor)}: ${formatFactor(factor.factor_co2_km)} kg de CO₂ por km.`,
+          });
+          setRecarga((valor) => valor + 1);
+        }}
+      />
 
       {aSustituir && (
         <SustituirFactor

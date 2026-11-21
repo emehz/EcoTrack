@@ -10,7 +10,7 @@ namespace EcoTrack.Services;
 public sealed class FactorHistorialService(AppDbContext db)
 {
     public const int LimiteMaximo = 100;
-    private const decimal FactorMaximo = 999999.999999m;
+    private const decimal FactorMaximo = 10m;
     private const int LargoMaximoFuente = 200;
 
     public async Task<(IReadOnlyList<FactorRespuesta> Datos, MetaPaginacion Meta)> ListarAsync(
@@ -112,7 +112,7 @@ public sealed class FactorHistorialService(AppDbContext db)
         var fuente = string.IsNullOrWhiteSpace(solicitud.Fuente) ? null : solicitud.Fuente.Trim();
         if (solicitud.FactorCo2Km is not > 0 or > FactorMaximo)
         {
-            errores.Add(new ErrorDetalle("factor_co2_km", "Escribe un factor mayor que cero, en kg de CO₂ por km."));
+            errores.Add(new ErrorDetalle("factor_co2_km", "Escribe un factor mayor que 0 y de hasta 10 kg de CO₂ por km."));
         }
         else if (solicitud.FactorCo2Km == anterior.FactorCo2Km)
         {

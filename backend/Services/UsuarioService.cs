@@ -11,7 +11,6 @@ namespace EcoTrack.Services;
 public sealed partial class UsuarioService(AppDbContext db, SesionVigente sesiones, SesionService refrescos)
 {
     public const int LimiteMaximo = 100;
-    private const int LargoMaximo = 80;
 
     private static readonly Dictionary<string, RolUsuario> Roles = new()
     {
@@ -94,8 +93,8 @@ public sealed partial class UsuarioService(AppDbContext db, SesionVigente sesion
             errores.Add(new ErrorDetalle("correo", "Escribe un correo válido, por ejemplo nombre@empresa.com."));
         }
 
-        var nombres = Texto(solicitud.Nombres, "nombres", "Escribe los nombres.", errores);
-        var apellidos = Texto(solicitud.Apellidos, "apellidos", "Escribe los apellidos.", errores);
+        var nombres = DatosPersona.Nombre(solicitud.Nombres, "nombres", "Escribe los nombres.", errores);
+        var apellidos = DatosPersona.Nombre(solicitud.Apellidos, "apellidos", "Escribe los apellidos.", errores);
         var rol = LeerRol(solicitud.Rol, errores);
         ContrasenaSegura.Validar(solicitud.Contrasena, "contrasena", errores);
         if (errores.Count > 0)
@@ -132,8 +131,8 @@ public sealed partial class UsuarioService(AppDbContext db, SesionVigente sesion
         var usuario = await db.Usuarios.FirstOrDefaultAsync(u => u.UsuarioId == id, cancelacion) ?? throw NoExiste();
 
         var errores = new List<ErrorDetalle>();
-        var nombres = Texto(solicitud.Nombres, "nombres", "Escribe los nombres.", errores);
-        var apellidos = Texto(solicitud.Apellidos, "apellidos", "Escribe los apellidos.", errores);
+        var nombres = DatosPersona.Nombre(solicitud.Nombres, "nombres", "Escribe los nombres.", errores);
+        var apellidos = DatosPersona.Nombre(solicitud.Apellidos, "apellidos", "Escribe los apellidos.", errores);
         var rol = LeerRol(solicitud.Rol, errores);
         if (errores.Count > 0)
         {
@@ -228,21 +227,6 @@ public sealed partial class UsuarioService(AppDbContext db, SesionVigente sesion
         return null;
     }
 
-    private static string? Texto(string? valor, string campo, string mensaje, List<ErrorDetalle> errores)
-    {
-        var limpio = string.IsNullOrWhiteSpace(valor) ? null : MultiplesEspacios().Replace(valor.Trim(), " ");
-        if (limpio is null)
-        {
-            errores.Add(new ErrorDetalle(campo, mensaje));
-        }
-        else if (limpio.Length > LargoMaximo)
-        {
-            errores.Add(new ErrorDetalle(campo, "Usa como máximo 80 caracteres."));
-        }
-
-        return limpio;
-    }
-
     private static UsuarioRespuesta ARespuesta(Usuario u) =>
         new(u.UsuarioId, u.Correo, u.Nombres, u.Apellidos, u.Rol, u.Activo, u.CreadoEn, u.ActualizadoEn);
 
@@ -251,9 +235,6 @@ public sealed partial class UsuarioService(AppDbContext db, SesionVigente sesion
     public static ApiException CorreoOcupado() => ApiException.Conflicto("Ya existe un usuario con ese correo.",
         [new ErrorDetalle("correo", "Ya existe un usuario con este correo.")]);
 
-    [GeneratedRegex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")]
+    [GeneratedRegex(@"^[a-z0-9._%+-]+@[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,}$")]
     private static partial Regex Correo();
-
-    [GeneratedRegex(@"\s+")]
-    private static partial Regex MultiplesEspacios();
 }

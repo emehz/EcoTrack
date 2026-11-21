@@ -8,7 +8,8 @@ namespace EcoTrack.Services;
 
 public sealed class FactorEmisionService(AppDbContext db)
 {
-    private const decimal FactorMaximo = 999999.999999m;
+    private const decimal FactorMaximo = 10m;
+    private const int LargoMaximoFuente = 200;
 
     public async Task<FactorVigenteRespuesta> ObtenerVigenteAsync(
         string? tipoVehiculo, string? tipoCombustible, DateOnly? fecha, CancellationToken cancelacion)
@@ -42,12 +43,16 @@ public sealed class FactorEmisionService(AppDbContext db)
 
         if (solicitud.FactorCo2Km is not > 0 or > FactorMaximo)
         {
-            errores.Add(new ErrorDetalle("factor_co2_km", "Escribe un factor mayor que cero, en kg de CO₂ por km."));
+            errores.Add(new ErrorDetalle("factor_co2_km", "Escribe un factor mayor que 0 y de hasta 10 kg de CO₂ por km."));
         }
 
         if (fuente is null)
         {
             errores.Add(new ErrorDetalle("fuente", "Indica de dónde sale el factor."));
+        }
+        else if (fuente.Length > LargoMaximoFuente)
+        {
+            errores.Add(new ErrorDetalle("fuente", "Usa como máximo 200 caracteres."));
         }
 
         if (errores.Count > 0)
