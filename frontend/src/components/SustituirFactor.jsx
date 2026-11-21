@@ -17,9 +17,12 @@ export function SustituirFactor({ factor, combinacion, onSustituido, onCerrar })
   const guardar = async () => {
     const valor = Number(form.factor.replace(',', '.'));
     const nuevos = {};
-    if (!form.factor || !(valor > 0)) nuevos.factor_co2_km = 'Escribe un factor mayor que cero.';
+    if (!form.factor || !(valor > 0) || valor > 10) {
+      nuevos.factor_co2_km = 'Escribe un factor mayor que 0 y de hasta 10 kg de CO₂ por km.';
+    }
     if (!form.desde) nuevos.vigente_desde = 'Indica desde qué fecha rige.';
     if (!form.fuente.trim()) nuevos.fuente = 'Indica de dónde sale el nuevo factor.';
+    else if (form.fuente.trim().length > 200) nuevos.fuente = 'Usa como máximo 200 caracteres.';
     setErrores(nuevos);
     setErrorGeneral('');
     if (Object.keys(nuevos).length > 0) return;
@@ -75,6 +78,7 @@ export function SustituirFactor({ factor, combinacion, onSustituido, onCerrar })
       <Field
         label="Fuente"
         placeholder="Ej. EPA/GLEC 2026"
+        maxLength={200}
         value={form.fuente}
         onChange={(event) => actualizar('fuente', event.target.value)}
         error={errores.fuente}

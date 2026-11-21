@@ -11,6 +11,7 @@ import {
   PageHeader,
 } from "../components/ui";
 import { OPCIONES_ROL, erroresDe, validarContrasena } from "../utils/usuarios";
+import { validarCorreo, validarNombre } from "../utils/validaciones";
 import styles from "../components/Formulario.module.css";
 
 const VACIO = {
@@ -59,9 +60,15 @@ export default function UsuarioForm() {
   const enviar = async (event) => {
     event.preventDefault();
     const nuevos = {};
-    if (!editando && !form.correo.trim()) nuevos.correo = "Escribe el correo.";
-    if (!form.nombres.trim()) nuevos.nombres = "Escribe los nombres.";
-    if (!form.apellidos.trim()) nuevos.apellidos = "Escribe los apellidos.";
+    const problemaCorreo = editando ? null : validarCorreo(form.correo);
+    if (problemaCorreo) nuevos.correo = problemaCorreo;
+    const problemaNombres = validarNombre(form.nombres, "Escribe los nombres.");
+    if (problemaNombres) nuevos.nombres = problemaNombres;
+    const problemaApellidos = validarNombre(
+      form.apellidos,
+      "Escribe los apellidos.",
+    );
+    if (problemaApellidos) nuevos.apellidos = problemaApellidos;
     if (!form.rol) nuevos.rol = "Elige el rol.";
     if (!editando) {
       const problema = validarContrasena(form.contrasena, form.confirmacion);
@@ -78,15 +85,15 @@ export default function UsuarioForm() {
         apellidos: form.apellidos,
         rol: form.rol,
       };
-      if (editando) await updateUsuario(id, cuerpo);
-      else
-        await createUsuario({
-          ...cuerpo,
-          correo: form.correo,
-          contrasena: form.contrasena,
-        });
+      const { data } = editando
+        ? await updateUsuario(id, cuerpo)
+        : await createUsuario({
+            ...cuerpo,
+            correo: form.correo.trim().toLowerCase(),
+            contrasena: form.contrasena,
+          });
       toast.success(editando ? "Usuario actualizado" : "Usuario creado", {
-        description: `${form.nombres} ${form.apellidos}`,
+        description: `${data.nombres} ${data.apellidos}`,
       });
       navigate("/usuarios");
     } catch (falla) {

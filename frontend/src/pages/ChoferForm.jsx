@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { createChofer, getChofer, updateChofer } from '../api/endpoints';
 import { Button, EmptyState, Field, Notice, PageHeader } from '../components/ui';
 import { nombreCompleto } from '../utils/choferes';
+import { validarLicencia, validarNombre } from '../utils/validaciones';
 import styles from '../components/Formulario.module.css';
 
 const VACIO = { nombres: '', apellidos: '', numero_licencia: '', telefono: '' };
@@ -38,10 +39,12 @@ export default function ChoferForm() {
 
   const enviar = async (event) => {
     event.preventDefault();
-    const nuevos = {};
-    if (!form.nombres.trim()) nuevos.nombres = 'Escribe los nombres.';
-    if (!form.apellidos.trim()) nuevos.apellidos = 'Escribe los apellidos.';
-    if (!form.numero_licencia.trim()) nuevos.numero_licencia = 'Escribe el número de licencia.';
+    const revision = {
+      nombres: validarNombre(form.nombres, 'Escribe los nombres.'),
+      apellidos: validarNombre(form.apellidos, 'Escribe los apellidos.'),
+      numero_licencia: validarLicencia(form.numero_licencia),
+    };
+    const nuevos = Object.fromEntries(Object.entries(revision).filter(([, mensaje]) => mensaje));
     setErrores(nuevos);
     setErrorGeneral('');
     if (Object.keys(nuevos).length > 0) return;
@@ -107,9 +110,12 @@ export default function ChoferForm() {
               <Field
                 label="Número de licencia"
                 value={form.numero_licencia}
-                onChange={(event) => actualizar('numero_licencia', event.target.value.toUpperCase())}
+                inputMode="numeric"
+                placeholder="00000000-0"
+                maxLength={20}
+                onChange={(event) => actualizar('numero_licencia', event.target.value)}
                 error={errores.numero_licencia}
-                help="No puede repetirse entre choferes."
+                help="Formato del DUI (00000000-0) o del NIT (0000-000000-000-0). No puede repetirse."
                 autoComplete="off"
               />
               <Field
