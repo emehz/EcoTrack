@@ -7,6 +7,7 @@ import { Button, EmptyState, Field, Notice, PageHeader } from '../components/ui'
 import { nombreCompleto } from '../utils/choferes';
 import { formatNumber } from '../utils/format';
 import { OPCIONES_ESTADO_NUEVO, aEntradaLocal, deEntradaLocal, leerDistancia } from '../utils/viajes';
+import { validarLugar } from '../utils/validaciones';
 import styles from '../components/Formulario.module.css';
 
 const vacio = () => ({
@@ -75,8 +76,13 @@ export default function ViajeForm() {
     const distancia = leerDistancia(form.distancia);
     const nuevos = {};
     if (!form.vehiculo_id) nuevos.vehiculo_id = 'Elige el vehículo.';
-    if (!form.origen.trim()) nuevos.origen = 'Escribe el origen.';
-    if (!form.destino.trim()) nuevos.destino = 'Escribe el destino.';
+    const problemaOrigen = validarLugar(form.origen, 'Escribe el origen.');
+    const problemaDestino = validarLugar(form.destino, 'Escribe el destino.');
+    if (problemaOrigen) nuevos.origen = problemaOrigen;
+    if (problemaDestino) nuevos.destino = problemaDestino;
+    else if (!problemaOrigen && form.origen.trim().toLowerCase() === form.destino.trim().toLowerCase()) {
+      nuevos.destino = 'El destino debe ser distinto del origen.';
+    }
     if (!form.salida) nuevos.salida_en = 'Indica la fecha y hora de salida.';
     if (distancia === null || distancia < 0) nuevos.distancia_km = 'Escribe la distancia en kilómetros.';
     if (conLlegada && !form.llegada) nuevos.llegada_en = 'Indica la fecha y hora de llegada.';

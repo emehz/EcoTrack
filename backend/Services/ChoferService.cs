@@ -11,8 +11,6 @@ namespace EcoTrack.Services;
 public sealed partial class ChoferService(AppDbContext db)
 {
     public const int LimiteMaximo = 100;
-    private const int LargoMaximoNombre = 80;
-    private const int LargoMaximoLicencia = 30;
 
     private static readonly Dictionary<string, EstadoChofer> Estados = new()
     {
@@ -175,22 +173,10 @@ public sealed partial class ChoferService(AppDbContext db)
     private static (string Nombres, string Apellidos, string Licencia, string? Telefono) Validar(
         ChoferGuardarSolicitud solicitud, List<ErrorDetalle> errores)
     {
-        var nombres = Texto(solicitud.Nombres);
-        var apellidos = Texto(solicitud.Apellidos);
-        var licencia = Texto(solicitud.NumeroLicencia)?.ToUpperInvariant();
+        var nombres = DatosPersona.Nombre(solicitud.Nombres, "nombres", "Escribe los nombres.", errores);
+        var apellidos = DatosPersona.Nombre(solicitud.Apellidos, "apellidos", "Escribe los apellidos.", errores);
+        var licencia = DatosPersona.Licencia(solicitud.NumeroLicencia, errores);
         var telefono = Texto(solicitud.Telefono);
-
-        ValidarNombre(nombres, "nombres", "Escribe los nombres.", errores);
-        ValidarNombre(apellidos, "apellidos", "Escribe los apellidos.", errores);
-
-        if (licencia is null)
-        {
-            errores.Add(new ErrorDetalle("numero_licencia", "Escribe el número de licencia."));
-        }
-        else if (licencia.Length > LargoMaximoLicencia || !Licencia().IsMatch(licencia))
-        {
-            errores.Add(new ErrorDetalle("numero_licencia", "Usa solo letras, números y guiones, hasta 30 caracteres."));
-        }
 
         if (telefono is not null)
         {
@@ -206,18 +192,6 @@ public sealed partial class ChoferService(AppDbContext db)
         }
 
         return (nombres ?? string.Empty, apellidos ?? string.Empty, licencia ?? string.Empty, telefono);
-    }
-
-    private static void ValidarNombre(string? valor, string campo, string mensaje, List<ErrorDetalle> errores)
-    {
-        if (valor is null)
-        {
-            errores.Add(new ErrorDetalle(campo, mensaje));
-        }
-        else if (valor.Length > LargoMaximoNombre)
-        {
-            errores.Add(new ErrorDetalle(campo, "Usa como máximo 80 caracteres."));
-        }
     }
 
     private static EstadoChofer? LeerEstado(string? valor, List<ErrorDetalle> errores)
@@ -275,9 +249,6 @@ public sealed partial class ChoferService(AppDbContext db)
     private static string? Texto(string? valor) => string.IsNullOrWhiteSpace(valor) ? null : MultiplesEspacios().Replace(valor.Trim(), " ");
 
     private static ApiException NoExiste() => ApiException.NoEncontrado("El chofer no existe.");
-
-    [GeneratedRegex("^[A-Z0-9-]+$")]
-    private static partial Regex Licencia();
 
     [GeneratedRegex(@"[\s-]")]
     private static partial Regex Digitos();

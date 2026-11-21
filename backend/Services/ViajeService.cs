@@ -389,6 +389,10 @@ public sealed partial class ViajeService(AppDbContext db)
 
         var origen = Lugar(solicitud.Origen, "origen", "Escribe el origen.", errores);
         var destino = Lugar(solicitud.Destino, "destino", "Escribe el destino.", errores);
+        if (origen.Length > 0 && string.Equals(origen, destino, StringComparison.OrdinalIgnoreCase))
+        {
+            errores.Add(new ErrorDetalle("destino", "El destino debe ser distinto del origen."));
+        }
 
         if (solicitud.SalidaEn is null)
         {
@@ -498,6 +502,10 @@ public sealed partial class ViajeService(AppDbContext db)
         {
             errores.Add(new ErrorDetalle(campo, "Usa como máximo 120 caracteres."));
         }
+        else if (!LugarValido().IsMatch(texto) || texto.Count(char.IsLetter) < 2)
+        {
+            errores.Add(new ErrorDetalle(campo, "Escribe un lugar con letras; se permiten números, espacios y . , - # /"));
+        }
 
         return texto ?? string.Empty;
     }
@@ -523,4 +531,7 @@ public sealed partial class ViajeService(AppDbContext db)
 
     [GeneratedRegex(@"\s+")]
     private static partial Regex MultiplesEspacios();
+
+    [GeneratedRegex(@"^[\p{L}\p{N}][\p{L}\p{N} .,'’#()/-]*$")]
+    private static partial Regex LugarValido();
 }
